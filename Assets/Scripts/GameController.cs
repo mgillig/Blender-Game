@@ -11,6 +11,7 @@ public class GameController : MonoBehaviour
     public GameObject gridCell;
     public int gridSizeX;
     public int gridSizeZ;
+    public int enemySpawnRate;
     private GridCellModel[,] grid;
     private List<Vector2Int> availableCells;
 
@@ -34,6 +35,7 @@ public class GameController : MonoBehaviour
         int centerZ = grid.GetLength(1) / 2;
         int cellSizeX = (int)gridCell.transform.localScale.x;
         int cellSizeZ = (int)gridCell.transform.localScale.z;
+        int victorySide = Random.Range(0, 4);
         for (int x = 0; x < grid.GetLength(0); x++)
         {
             for(int z = 0; z < grid.GetLength(1); z++)
@@ -55,6 +57,31 @@ public class GameController : MonoBehaviour
                     cellTemp.transform.GetChild(1).gameObject.SetActive(false);
                     cellTemp.transform.GetChild(2).gameObject.SetActive(false);
                     cellTemp.transform.GetChild(3).gameObject.SetActive(false);
+                }
+                if((gridTemp.NWallActive ? 1 : 0) + (gridTemp.SWallActive ? 1 : 0) + (gridTemp.EWallActive ? 1 : 0) + (gridTemp.WWallActive ? 1 : 0)  == 3 && 
+                    (cellTempLocation.x > 5 || cellTempLocation.x < -5 || cellTempLocation.z > 5 || cellTempLocation.z < -5) && 
+                    Random.Range(0, enemySpawnRate) == 0)
+                    cellTemp.transform.GetChild(4).gameObject.SetActive(true);
+
+                if(victorySide == 0 && x == 0 && z == 0)
+                {
+                    cellTemp.transform.GetChild(5).gameObject.SetActive(true);
+                    cellTemp.transform.GetChild(4).gameObject.SetActive(false);
+                }
+                else if (victorySide == 1 && x == 0 && z == grid.GetLength(1) - 1)
+                {
+                    cellTemp.transform.GetChild(5).gameObject.SetActive(true);
+                    cellTemp.transform.GetChild(4).gameObject.SetActive(false);
+                }
+                else if (victorySide == 2 && x == grid.GetLength(0) - 1 && z == 0)
+                {
+                    cellTemp.transform.GetChild(5).gameObject.SetActive(true);
+                    cellTemp.transform.GetChild(4).gameObject.SetActive(false);
+                }
+                else if (victorySide == 3 && x == grid.GetLength(0) - 1 && z == grid.GetLength(1) - 1)
+                {
+                    cellTemp.transform.GetChild(5).gameObject.SetActive(true);
+                    cellTemp.transform.GetChild(4).gameObject.SetActive(false);
                 }
             }
         }

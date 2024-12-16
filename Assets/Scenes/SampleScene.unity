@@ -224,6 +224,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4331210895647705924, guid: e2377461956cb814895ba47e6dea565c, type: 3}
+      propertyPath: sensitivity
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4617402176600540925, guid: e2377461956cb814895ba47e6dea565c, type: 3}
+      propertyPath: speed
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 4908488988109900452, guid: e2377461956cb814895ba47e6dea565c, type: 3}
       propertyPath: m_Name
       value: Player
@@ -246,19 +254,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4908488988109900456, guid: e2377461956cb814895ba47e6dea565c, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.95266056
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4908488988109900456, guid: e2377461956cb814895ba47e6dea565c, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4908488988109900456, guid: e2377461956cb814895ba47e6dea565c, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.30403593
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4908488988109900456, guid: e2377461956cb814895ba47e6dea565c, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4908488988109900456, guid: e2377461956cb814895ba47e6dea565c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -266,11 +274,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4908488988109900456, guid: e2377461956cb814895ba47e6dea565c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: -35.4
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4908488988109900456, guid: e2377461956cb814895ba47e6dea565c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4908488988109900457, guid: e2377461956cb814895ba47e6dea565c, type: 3}
+      propertyPath: enemySpawnRate
+      value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e2377461956cb814895ba47e6dea565c, type: 3}

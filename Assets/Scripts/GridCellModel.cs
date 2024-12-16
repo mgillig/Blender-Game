@@ -12,18 +12,10 @@ namespace Assets.Scripts
 {
     public class GridCellModel
     {
-        public GridCellModel() 
-        {
-            NWallActive = true;
-            SWallActive = true;
-            EWallActive = true;
-            WWallActive = true;
-            IsFrontier = true;
-        }
-        public bool NWallActive { get; set; }
-        public bool SWallActive { get; set; }
-        public bool EWallActive { get; set; }
-        public bool WWallActive { get; set; }
-        public bool IsFrontier { get; set; }
+        public bool NWallActive { get; set; } = true;
+        public bool SWallActive { get; set; } = true;
+        public bool EWallActive { get; set; } = true;
+        public bool WWallActive { get; set; } = true;
+        public bool IsFrontier { get; set; } = true;
     }
 }
