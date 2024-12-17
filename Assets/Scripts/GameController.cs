@@ -58,10 +58,21 @@ public class GameController : MonoBehaviour
                     cellTemp.transform.GetChild(2).gameObject.SetActive(false);
                     cellTemp.transform.GetChild(3).gameObject.SetActive(false);
                 }
+
+
                 if((gridTemp.NWallActive ? 1 : 0) + (gridTemp.SWallActive ? 1 : 0) + (gridTemp.EWallActive ? 1 : 0) + (gridTemp.WWallActive ? 1 : 0)  == 3 && 
                     (cellTempLocation.x > 5 || cellTempLocation.x < -5 || cellTempLocation.z > 5 || cellTempLocation.z < -5) && 
                     Random.Range(0, enemySpawnRate) == 0)
-                    cellTemp.transform.GetChild(4).gameObject.SetActive(true);
+                {
+                    var enemyGameObject = cellTemp.transform.GetChild(4).gameObject;
+                    enemyGameObject.SetActive(true);
+                    if (!gridTemp.SWallActive)
+                        enemyGameObject.transform.Rotate(new Vector3(0f, 180f, 0f));
+                    else if (!gridTemp.EWallActive)
+                        enemyGameObject.transform.Rotate(new Vector3(0f, 90f, 0f));
+                    else if (!gridTemp.WWallActive)
+                        enemyGameObject.transform.Rotate(new Vector3(0f, -90f, 0f));
+                }
 
                 if(victorySide == 0 && x == 0 && z == 0)
                 {
