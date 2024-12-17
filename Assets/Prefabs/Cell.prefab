@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8847892887806987527}
   - component: {fileID: 7079848216468147736}
   - component: {fileID: 2060705532813768354}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Cube
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -64,7 +64,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 899a3ffd7ad8d2e4c8b025d1286771a2, type: 2}
+  - {fileID: 2100000, guid: 880b328b494ea9d4a9ae0bc644d925e2, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -98,7 +98,7 @@ GameObject:
   - component: {fileID: 3683703844093053733}
   - component: {fileID: 3683703844093053734}
   - component: {fileID: 3683703844093053735}
-  m_Layer: 2
+  m_Layer: 0
   m_Name: Wall N
   m_TagString: Wall
   m_Icon: {fileID: 0}
@@ -206,7 +206,7 @@ GameObject:
   - component: {fileID: 3683703844655741047}
   - component: {fileID: 3683703844655741320}
   - component: {fileID: 3683703844655741321}
-  m_Layer: 2
+  m_Layer: 0
   m_Name: Wall E
   m_TagString: Wall
   m_Icon: {fileID: 0}
@@ -311,7 +311,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3683703845270994533}
-  m_Layer: 2
+  m_Layer: 0
   m_Name: Cell
   m_TagString: Cell
   m_Icon: {fileID: 0}
@@ -351,7 +351,7 @@ GameObject:
   - component: {fileID: 2701397883175891426}
   - component: {fileID: 6162435224296992761}
   - component: {fileID: 8104700555947310651}
-  m_Layer: 2
+  m_Layer: 0
   m_Name: Victory
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -498,6 +498,8 @@ MonoBehaviour:
   activated: 0
   idle: 1
   pathTarget: {x: 0, y: 0, z: 0}
+  test: {fileID: 2100000, guid: 899a3ffd7ad8d2e4c8b025d1286771a2, type: 2}
+  player: {fileID: 4908488988109900452, guid: e2377461956cb814895ba47e6dea565c, type: 3}
 --- !u!135 &3224703329656987432
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -515,7 +517,7 @@ SphereCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
@@ -550,7 +552,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 899a3ffd7ad8d2e4c8b025d1286771a2, type: 2}
+  - {fileID: 2100000, guid: 880b328b494ea9d4a9ae0bc644d925e2, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -584,7 +586,7 @@ GameObject:
   - component: {fileID: 1285059381595240104}
   - component: {fileID: 9212417771303796376}
   - component: {fileID: 8643627494959057929}
-  m_Layer: 2
+  m_Layer: 0
   m_Name: Wall S
   m_TagString: Wall
   m_Icon: {fileID: 0}
@@ -692,7 +694,7 @@ GameObject:
   - component: {fileID: 7007319150757398450}
   - component: {fileID: 7975674534026659798}
   - component: {fileID: 4763912527469354130}
-  m_Layer: 2
+  m_Layer: 0
   m_Name: Wall W
   m_TagString: Wall
   m_Icon: {fileID: 0}

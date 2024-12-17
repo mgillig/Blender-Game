@@ -1,24 +1,45 @@
+using System.ComponentModel.Design.Serialization;
 using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
     public bool activated = false;
-    public bool idle = true;
+    public float cooldownTime = 5f;
+    private float cooldown = 0f;
     public Vector3 pathTarget;
+    public Material test;
+    public Transform playerTransform;
 
     void Start()
     {
-
+        playerTransform = GameObject.Find("Player").transform;
     }
 
     void Update()
     {
-        RaycastHit hit;
-        if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit))
+        if (cooldown <= 0f)
         {
-            if (hit.collider.gameObject.tag != "Wall")
-                print("hehehe I see you");
-            //print(hit.collider.gameObject.tag);
+            Vector3 direction = (this.transform.position - playerTransform.position).normalized * -1;
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position, direction, out hit))
+            {
+                pathTarget = hit.point;
+                if (hit.collider.gameObject.tag == "Player")
+                {
+                    if (!activated)
+                    {
+                        GetComponent<Renderer>().material = test;
+                        activated = true;
+                    }
+                }
+            }
         }
+        else
+            cooldown -= Time.deltaTime;
+    }
+
+    public void TriggerCooldown()
+    {
+        cooldown = cooldownTime;
     }
 }

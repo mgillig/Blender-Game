@@ -23,7 +23,7 @@ RenderSettings:
   m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
-  m_AmbientIntensity: 1
+  m_AmbientIntensity: 6.11
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
   m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
@@ -224,33 +224,9 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 4331210895647705924, guid: e2377461956cb814895ba47e6dea565c, type: 3}
-      propertyPath: sensitivity
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 4617402176600540925, guid: e2377461956cb814895ba47e6dea565c, type: 3}
-      propertyPath: speed
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 4908488986478180930, guid: e2377461956cb814895ba47e6dea565c, type: 3}
-      propertyPath: m_Layer
-      value: 3
-      objectReference: {fileID: 0}
     - target: {fileID: 4908488988109900452, guid: e2377461956cb814895ba47e6dea565c, type: 3}
       propertyPath: m_Name
       value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 4908488988109900452, guid: e2377461956cb814895ba47e6dea565c, type: 3}
-      propertyPath: m_Layer
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 4908488988109900452, guid: e2377461956cb814895ba47e6dea565c, type: 3}
-      propertyPath: m_TagString
-      value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 4908488988109900456, guid: e2377461956cb814895ba47e6dea565c, type: 3}
-      propertyPath: m_RootOrder
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4908488988109900456, guid: e2377461956cb814895ba47e6dea565c, type: 3}
       propertyPath: m_LocalPosition.x
@@ -292,20 +268,7 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4908488988109900457, guid: e2377461956cb814895ba47e6dea565c, type: 3}
-      propertyPath: enemySpawnRate
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 4908488988109900459, guid: e2377461956cb814895ba47e6dea565c, type: 3}
-      propertyPath: m_IsTrigger
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8100651402157560110, guid: e2377461956cb814895ba47e6dea565c, type: 3}
-      propertyPath: m_Layer
-      value: 3
-      objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 9119798053089007166, guid: e2377461956cb814895ba47e6dea565c, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

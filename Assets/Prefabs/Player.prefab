@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4908488986478180935}
   - component: {fileID: 4908488986478180928}
   - component: {fileID: 4908488986478180929}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Main Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
@@ -106,9 +106,9 @@ GameObject:
   - component: {fileID: 4331210895647705924}
   - component: {fileID: 4908488988109900458}
   - component: {fileID: 4908488988109900459}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -145,7 +145,7 @@ MonoBehaviour:
   gridCell: {fileID: 3683703845270994534, guid: be63c289ed6872f4ba14761d507b1995, type: 3}
   gridSizeX: 32
   gridSizeZ: 32
-  enemySpawnRate: 0
+  enemySpawnRate: 8
 --- !u!114 &4617402176600540925
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -173,7 +173,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8bcd92943b81e047b734680ff6e40ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sensitivity: 100
+  sensitivity: 2
   player: {fileID: 4908488988109900452}
 --- !u!143 &4908488988109900458
 CharacterController:
@@ -215,7 +215,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -234,7 +234,7 @@ GameObject:
   - component: {fileID: 8668239332753247027}
   - component: {fileID: 1895674446746414555}
   - component: {fileID: 4493085384531258289}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Gun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
