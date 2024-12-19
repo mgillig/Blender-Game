@@ -20,13 +20,14 @@ public class GameController : MonoBehaviour
     {
         grid = new GridCellModel[gridSizeX, gridSizeZ];
         GenerateMaze();
-        InstantiateGrid();
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        bool mouseInput = Input.GetAxisRaw("Fire1") > 0.0;
+        if (mouseInput)
+            InstantiateGrid();
     }
 
     void InstantiateGrid()
