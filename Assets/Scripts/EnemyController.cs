@@ -7,7 +7,6 @@ public class EnemyController : MonoBehaviour
     public float cooldownTime = 5f;
     private float cooldown = 0f;
     public Vector3 pathTarget;
-    public Material test;
     public Transform playerTransform;
 
     void Start()
@@ -28,7 +27,6 @@ public class EnemyController : MonoBehaviour
                 {
                     if (!activated)
                     {
-                        GetComponent<Renderer>().material = test;
                         activated = true;
                     }
                 }

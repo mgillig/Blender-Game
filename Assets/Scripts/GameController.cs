@@ -12,7 +12,7 @@ public class GameController : MonoBehaviour
     public int gridSizeX;
     public int gridSizeZ;
     public int enemySpawnRate;
-    public int lightSpawnRate;
+    public int lightFrequency;
     private GridCellModel[,] grid;
     private List<Vector2Int> availableCells;
 
@@ -39,10 +39,10 @@ public class GameController : MonoBehaviour
         int cellSizeX = (int)gridCell.transform.localScale.x;
         int cellSizeZ = (int)gridCell.transform.localScale.z;
         int victorySide = Random.Range(0, 4);
-        int lightCounter = Random.Range(lightSpawnRate / 3, lightSpawnRate);
-        for (int x = 0; x < grid.GetLength(0); x++)
+        int lightCounter = Random.Range(lightFrequency - 1, lightFrequency + 2);
+        for (int z = 0; z < grid.GetLength(1); z++)
         {
-            for(int z = 0; z < grid.GetLength(1); z++)
+            for(int x = 0; x < grid.GetLength(0); x++)
             {
                 var gridTemp = grid[x,z];
                 var cellTempLocation = new Vector3((x - centerX) * cellSizeX + (cellSizeX / 2), 0, (z - centerZ) * cellSizeZ + (cellSizeZ / 2));
@@ -102,13 +102,17 @@ public class GameController : MonoBehaviour
                 }
 
                 //Build Lights
-                if(lightCounter == 0)
+
+                if (gridTemp.SWallActive)
                 {
-                    cellTemp.transform.GetChild(6).gameObject.SetActive(true);
-                    lightCounter = Random.Range(lightSpawnRate / 3, lightSpawnRate);
+                    if (lightCounter <= 0)
+                    {
+                        cellTemp.transform.GetChild(6).gameObject.SetActive(true);
+                        lightCounter = Random.Range(lightFrequency - 1, lightFrequency + 2);
+                    }
+                    else
+                        lightCounter--;
                 }
-                else
-                    lightCounter--;
             }
         }
     }
