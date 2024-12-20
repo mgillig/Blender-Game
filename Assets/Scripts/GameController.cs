@@ -12,6 +12,7 @@ public class GameController : MonoBehaviour
     public int gridSizeX;
     public int gridSizeZ;
     public int enemySpawnRate;
+    public int lightSpawnRate;
     private GridCellModel[,] grid;
     private List<Vector2Int> availableCells;
 
@@ -20,14 +21,15 @@ public class GameController : MonoBehaviour
     {
         grid = new GridCellModel[gridSizeX, gridSizeZ];
         GenerateMaze();
+        InstantiateGrid();
     }
 
     // Update is called once per frame
     void Update()
     {
-        bool mouseInput = Input.GetAxisRaw("Fire1") > 0.0;
-        if (mouseInput)
-            InstantiateGrid();
+        //bool mouseInput = Input.GetAxisRaw("Fire1") > 0.0;
+        //if (mouseInput)
+        //    InstantiateGrid();
     }
 
     void InstantiateGrid()
@@ -37,6 +39,7 @@ public class GameController : MonoBehaviour
         int cellSizeX = (int)gridCell.transform.localScale.x;
         int cellSizeZ = (int)gridCell.transform.localScale.z;
         int victorySide = Random.Range(0, 4);
+        int lightCounter = Random.Range(lightSpawnRate / 3, lightSpawnRate);
         for (int x = 0; x < grid.GetLength(0); x++)
         {
             for(int z = 0; z < grid.GetLength(1); z++)
@@ -45,6 +48,7 @@ public class GameController : MonoBehaviour
                 var cellTempLocation = new Vector3((x - centerX) * cellSizeX + (cellSizeX / 2), 0, (z - centerZ) * cellSizeZ + (cellSizeZ / 2));
                 var cellTemp = Instantiate(gridCell, cellTempLocation, new Quaternion());
 
+                //Build Walls
                 if(cellTempLocation.x > 4 || cellTempLocation.x < -4 || cellTempLocation.z > 4 || cellTempLocation.z < -4)
                 {
                     cellTemp.transform.GetChild(0).gameObject.SetActive(gridTemp.NWallActive);
@@ -60,7 +64,7 @@ public class GameController : MonoBehaviour
                     cellTemp.transform.GetChild(3).gameObject.SetActive(false);
                 }
 
-
+                //Set Enemies
                 if((gridTemp.NWallActive ? 1 : 0) + (gridTemp.SWallActive ? 1 : 0) + (gridTemp.EWallActive ? 1 : 0) + (gridTemp.WWallActive ? 1 : 0)  == 3 && 
                     (cellTempLocation.x > 5 || cellTempLocation.x < -5 || cellTempLocation.z > 5 || cellTempLocation.z < -5) && 
                     Random.Range(0, enemySpawnRate) == 0)
@@ -75,6 +79,7 @@ public class GameController : MonoBehaviour
                         enemyGameObject.transform.Rotate(new Vector3(0f, -90f, 0f));
                 }
 
+                //Set Victory
                 if(victorySide == 0 && x == 0 && z == 0)
                 {
                     cellTemp.transform.GetChild(5).gameObject.SetActive(true);
@@ -95,6 +100,15 @@ public class GameController : MonoBehaviour
                     cellTemp.transform.GetChild(5).gameObject.SetActive(true);
                     cellTemp.transform.GetChild(4).gameObject.SetActive(false);
                 }
+
+                //Build Lights
+                if(lightCounter == 0)
+                {
+                    cellTemp.transform.GetChild(6).gameObject.SetActive(true);
+                    lightCounter = Random.Range(lightSpawnRate / 3, lightSpawnRate);
+                }
+                else
+                    lightCounter--;
             }
         }
     }

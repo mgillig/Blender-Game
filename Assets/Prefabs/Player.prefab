@@ -161,6 +161,7 @@ MonoBehaviour:
   gridSizeX: 32
   gridSizeZ: 32
   enemySpawnRate: 8
+  lightSpawnRate: 15
 --- !u!114 &4617402176600540925
 MonoBehaviour:
   m_ObjectHideFlags: 0
