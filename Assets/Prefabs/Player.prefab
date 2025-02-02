@@ -356,7 +356,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa1308b0dba5cc34cb142f85fc556496, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridCell: {fileID: 3683703845270994534, guid: be63c289ed6872f4ba14761d507b1995, type: 3}
+  wall: {fileID: 5779296383728739926, guid: 054f8ffea08b2a14ea04a58ca796aa95, type: 3}
+  enemy: {fileID: 5032635465532813001, guid: 03d7d31d92e029a4080f2a343667b1e9, type: 3}
+  victory: {fileID: 2844451526991821811, guid: ec8f2b5adf9f93544a926e376f264df1, type: 3}
   gridSizeX: 32
   gridSizeZ: 32
   enemySpawnRate: 8

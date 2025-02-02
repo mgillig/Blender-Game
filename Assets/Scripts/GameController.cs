@@ -8,7 +8,10 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour
 {
-    public GameObject gridCell;
+    //public GameObject gridCell;
+    public GameObject wall;
+    public GameObject enemy;
+    public GameObject victory;
     public int gridSizeX;
     public int gridSizeZ;
     public int enemySpawnRate;
@@ -45,89 +48,141 @@ public class GameController : MonoBehaviour
     {
         int centerX = grid.GetLength(0) / 2;
         int centerZ = grid.GetLength(1) / 2;
-        int cellSizeX = (int)gridCell.transform.localScale.x;
-        int cellSizeZ = (int)gridCell.transform.localScale.z;
+        float wallSize = wall.transform.localScale.x;
         int victorySide = Random.Range(0, 4);
-        int lightCounter = Random.Range(lightFrequency - 1, lightFrequency + 2);
+
         for (int z = 0; z < grid.GetLength(1); z++)
         {
-            for(int x = 0; x < grid.GetLength(0); x++)
+            for (int x = 0; x < grid.GetLength(0); x++)
             {
-                var gridTemp = grid[x,z];
-                var cellTempLocation = new Vector3((x - centerX) * cellSizeX + (cellSizeX / 2), 0, (z - centerZ) * cellSizeZ + (cellSizeZ / 2));
-                var cellTemp = Instantiate(gridCell, cellTempLocation, new Quaternion());
-
-                //Build Walls
-                if(cellTempLocation.x > 4 || cellTempLocation.x < -4 || cellTempLocation.z > 4 || cellTempLocation.z < -4)
+                var gridCell = grid[x, z];
+                var cellTempLocation = new Vector3((x - centerX) * wallSize, 1, (z - centerZ) * wallSize);
+                //build walls
+                //S and W walls
+                if (gridCell.SWallActive)
                 {
-                    cellTemp.transform.GetChild(0).gameObject.SetActive(gridTemp.NWallActive);
-                    cellTemp.transform.GetChild(2).gameObject.SetActive(gridTemp.EWallActive);
-
-                    if (z == 0)
-                        cellTemp.transform.GetChild(1).gameObject.SetActive(true);
-                    if (x == 0)
-                        cellTemp.transform.GetChild(3).gameObject.SetActive(true);
+                    wall.name = "wall (" + x + ", " + z + ") S";
+                    var wallLocation = new Vector3(cellTempLocation.x, cellTempLocation.y, cellTempLocation.z - (wallSize / 2));
+                    var wallRotation = new Quaternion(0f, z % 2 == 0 ? 0f : 180f, 0f, 0f);
+                    Instantiate(wall, wallLocation, wallRotation);
                 }
-                else
+                if (gridCell.WWallActive)
                 {
-                    cellTemp.transform.GetChild(0).gameObject.SetActive(false);
-                    //cellTemp.transform.GetChild(1).gameObject.SetActive(false);
-                    cellTemp.transform.GetChild(2).gameObject.SetActive(false);
-                    //cellTemp.transform.GetChild(3).gameObject.SetActive(false);
+                    wall.name = "wall (" + x + ", " + z + ") W";
+                    var wallLocation = new Vector3(cellTempLocation.x - (wallSize / 2), cellTempLocation.y, cellTempLocation.z);
+                    //var wallRotation = new Quaternion(0f, 0f, 0f, 0f);
+                    var newWall = Instantiate(wall, wallLocation, new Quaternion());
+                    newWall.transform.Rotate(new Vector3(0f, x % 2 == 0 ? 90f : -90f, 0f));
                 }
 
-                //Set Enemies
-                if((gridTemp.NWallActive ? 1 : 0) + (gridTemp.SWallActive ? 1 : 0) + (gridTemp.EWallActive ? 1 : 0) + (gridTemp.WWallActive ? 1 : 0)  == 3 && 
-                    (cellTempLocation.x > 5 || cellTempLocation.x < -5 || cellTempLocation.z > 5 || cellTempLocation.z < -5) && 
-                    Random.Range(0, enemySpawnRate) == 0)
+                //N and E walls
+                //only used on last cell of row and column since the N and E walls are the S and W walls of the next cell
+                if (z == grid.GetLength(1) - 1 && gridCell.NWallActive)
                 {
-                    var enemyGameObject = cellTemp.transform.GetChild(4).gameObject;
-                    enemyGameObject.SetActive(true);
-                    if (!gridTemp.SWallActive)
-                        enemyGameObject.transform.Rotate(new Vector3(0f, 180f, 0f));
-                    else if (!gridTemp.EWallActive)
-                        enemyGameObject.transform.Rotate(new Vector3(0f, 90f, 0f));
-                    else if (!gridTemp.WWallActive)
-                        enemyGameObject.transform.Rotate(new Vector3(0f, -90f, 0f));
+                    wall.name = "wall (" + x + ", " + z + ") N";
+                    var wallLocation = new Vector3(cellTempLocation.x, cellTempLocation.y, cellTempLocation.z + (wallSize / 2));
+                    var wallRotation = new Quaternion(0f, z + 1 % 2 == 0 ? 0f : 180f, 0f, 0f);
+                    Instantiate(wall, wallLocation, wallRotation);
                 }
-
-                //Set Victory
-                if(victorySide == 0 && x == 0 && z == 0)
+                if (x == grid.GetLength(0) - 1 && gridCell.EWallActive)
                 {
-                    cellTemp.transform.GetChild(5).gameObject.SetActive(true);
-                    cellTemp.transform.GetChild(4).gameObject.SetActive(false);
-                }
-                else if (victorySide == 1 && x == 0 && z == grid.GetLength(1) - 1)
-                {
-                    cellTemp.transform.GetChild(5).gameObject.SetActive(true);
-                    cellTemp.transform.GetChild(4).gameObject.SetActive(false);
-                }
-                else if (victorySide == 2 && x == grid.GetLength(0) - 1 && z == 0)
-                {
-                    cellTemp.transform.GetChild(5).gameObject.SetActive(true);
-                    cellTemp.transform.GetChild(4).gameObject.SetActive(false);
-                }
-                else if (victorySide == 3 && x == grid.GetLength(0) - 1 && z == grid.GetLength(1) - 1)
-                {
-                    cellTemp.transform.GetChild(5).gameObject.SetActive(true);
-                    cellTemp.transform.GetChild(4).gameObject.SetActive(false);
-                }
-
-                //Build Lights
-
-                if (gridTemp.SWallActive)
-                {
-                    if (lightCounter <= 0)
-                    {
-                        cellTemp.transform.GetChild(6).gameObject.SetActive(true);
-                        lightCounter = Random.Range(lightFrequency - 1, lightFrequency + 2);
-                    }
-                    else
-                        lightCounter--;
+                    wall.name = "wall (" + x + ", " + z + ") E";
+                    var wallLocation = new Vector3(cellTempLocation.x + (wallSize / 2), cellTempLocation.y, cellTempLocation.z);
+                    //var wallRotation = new Quaternion(0f, 0f, 0f, 0f);
+                    var newWall = Instantiate(wall, wallLocation, new Quaternion());
+                    newWall.transform.Rotate(new Vector3(0f, x + 1 % 2 == 0 ? 90f : -90f, 0f));
                 }
             }
         }
     }
+
+    //void OldInstantiateGrid()
+    //{
+    //    int centerX = grid.GetLength(0) / 2;
+    //    int centerZ = grid.GetLength(1) / 2;
+    //    int cellSizeX = (int)gridCell.transform.localScale.x;
+    //    int cellSizeZ = (int)gridCell.transform.localScale.z;
+    //    int victorySide = Random.Range(0, 4);
+    //    int lightCounter = Random.Range(lightFrequency - 1, lightFrequency + 2);
+    //    for (int z = 0; z < grid.GetLength(1); z++)
+    //    {
+    //        for(int x = 0; x < grid.GetLength(0); x++)
+    //        {
+    //            var gridTemp = grid[x,z];
+    //            var cellTempLocation = new Vector3((x - centerX) * cellSizeX + (cellSizeX / 2), 0, (z - centerZ) * cellSizeZ + (cellSizeZ / 2));
+    //            var cellTemp = Instantiate(gridCell, cellTempLocation, new Quaternion());
+
+    //            //Build Walls
+    //            if(cellTempLocation.x > 4 || cellTempLocation.x < -4 || cellTempLocation.z > 4 || cellTempLocation.z < -4)
+    //            {
+    //                cellTemp.transform.GetChild(0).gameObject.SetActive(gridTemp.NWallActive);
+    //                cellTemp.transform.GetChild(2).gameObject.SetActive(gridTemp.EWallActive);
+
+    //                if (z == 0)
+    //                    cellTemp.transform.GetChild(1).gameObject.SetActive(true);
+    //                if (x == 0)
+    //                    cellTemp.transform.GetChild(3).gameObject.SetActive(true);
+    //            }
+    //            else
+    //            {
+    //                cellTemp.transform.GetChild(0).gameObject.SetActive(false);
+    //                //cellTemp.transform.GetChild(1).gameObject.SetActive(false);
+    //                cellTemp.transform.GetChild(2).gameObject.SetActive(false);
+    //                //cellTemp.transform.GetChild(3).gameObject.SetActive(false);
+    //            }
+
+    //            //Set Enemies
+    //            if((gridTemp.NWallActive ? 1 : 0) + (gridTemp.SWallActive ? 1 : 0) + (gridTemp.EWallActive ? 1 : 0) + (gridTemp.WWallActive ? 1 : 0)  == 3 && 
+    //                (cellTempLocation.x > 5 || cellTempLocation.x < -5 || cellTempLocation.z > 5 || cellTempLocation.z < -5) && 
+    //                Random.Range(0, enemySpawnRate) == 0)
+    //            {
+    //                var enemyGameObject = cellTemp.transform.GetChild(4).gameObject;
+    //                enemyGameObject.SetActive(true);
+    //                if (!gridTemp.SWallActive)
+    //                    enemyGameObject.transform.Rotate(new Vector3(0f, 180f, 0f));
+    //                else if (!gridTemp.EWallActive)
+    //                    enemyGameObject.transform.Rotate(new Vector3(0f, 90f, 0f));
+    //                else if (!gridTemp.WWallActive)
+    //                    enemyGameObject.transform.Rotate(new Vector3(0f, -90f, 0f));
+    //            }
+
+    //            //Set Victory
+    //            if(victorySide == 0 && x == 0 && z == 0)
+    //            {
+    //                cellTemp.transform.GetChild(5).gameObject.SetActive(true);
+    //                cellTemp.transform.GetChild(4).gameObject.SetActive(false);
+    //            }
+    //            else if (victorySide == 1 && x == 0 && z == grid.GetLength(1) - 1)
+    //            {
+    //                cellTemp.transform.GetChild(5).gameObject.SetActive(true);
+    //                cellTemp.transform.GetChild(4).gameObject.SetActive(false);
+    //            }
+    //            else if (victorySide == 2 && x == grid.GetLength(0) - 1 && z == 0)
+    //            {
+    //                cellTemp.transform.GetChild(5).gameObject.SetActive(true);
+    //                cellTemp.transform.GetChild(4).gameObject.SetActive(false);
+    //            }
+    //            else if (victorySide == 3 && x == grid.GetLength(0) - 1 && z == grid.GetLength(1) - 1)
+    //            {
+    //                cellTemp.transform.GetChild(5).gameObject.SetActive(true);
+    //                cellTemp.transform.GetChild(4).gameObject.SetActive(false);
+    //            }
+
+    //            //Build Lights
+
+    //            if (gridTemp.SWallActive)
+    //            {
+    //                if (lightCounter <= 0)
+    //                {
+    //                    cellTemp.transform.GetChild(6).gameObject.SetActive(true);
+    //                    lightCounter = Random.Range(lightFrequency - 1, lightFrequency + 2);
+    //                }
+    //                else
+    //                    lightCounter--;
+    //            }
+    //        }
+    //    }
+    //}
 
     private List<Vector2Int> BuildFrontier(GridCellModel[,] grid, Vector2Int currentCell, List<Vector2Int> neighbors)
     {
@@ -166,29 +221,41 @@ public class GameController : MonoBehaviour
             {
                 IsFrontier = false
             };
-            //remove currentCell.nWall & newCell.sWall: y+1
-            if (currentCell.y + 1 == frontierToAdd.y)
+
+            if(frontierToAdd.x > ((float)grid.GetLength(0) / 2f) - 2f && frontierToAdd.x < ((float)grid.GetLength(0) / 2f) + 2f &&
+                frontierToAdd.y > ((float)grid.GetLength(1) / 2f) - 2f && frontierToAdd.y < ((float)grid.GetLength(1) / 2f) + 2f)
             {
-                grid[currentCell.x, currentCell.y].NWallActive = false;
                 newCell.SWallActive = false;
-            }
-            //remove currentCell.sWall & newCell.nWall: y-1
-            else if (currentCell.y - 1 == frontierToAdd.y)
-            {
-                grid[currentCell.x, currentCell.y].SWallActive = false;
                 newCell.NWallActive = false;
-            }
-            //remove currentCell.eWall & newCell.wWall: x+1
-            else if (currentCell.x + 1 == frontierToAdd.x)
-            {
-                grid[currentCell.x, currentCell.y].EWallActive = false;
+                newCell.EWallActive = false;
                 newCell.WWallActive = false;
             }
-            //remove currentCell.wWall & newCell.eWall: x-1
-            else if (currentCell.x - 1 == frontierToAdd.x)
+            else
             {
-                grid[currentCell.x, currentCell.y].WWallActive = false;
-                newCell.EWallActive = false;
+                //remove currentCell.nWall & newCell.sWall: y+1
+                if (currentCell.y + 1 == frontierToAdd.y)
+                {
+                    grid[currentCell.x, currentCell.y].NWallActive = false;
+                    newCell.SWallActive = false;
+                }
+                //remove currentCell.sWall & newCell.nWall: y-1
+                else if (currentCell.y - 1 == frontierToAdd.y)
+                {
+                    grid[currentCell.x, currentCell.y].SWallActive = false;
+                    newCell.NWallActive = false;
+                }
+                //remove currentCell.eWall & newCell.wWall: x+1
+                else if (currentCell.x + 1 == frontierToAdd.x)
+                {
+                    grid[currentCell.x, currentCell.y].EWallActive = false;
+                    newCell.WWallActive = false;
+                }
+                //remove currentCell.wWall & newCell.eWall: x-1
+                else if (currentCell.x - 1 == frontierToAdd.x)
+                {
+                    grid[currentCell.x, currentCell.y].WWallActive = false;
+                    newCell.EWallActive = false;
+                }
             }
 
             grid[frontierToAdd.x, frontierToAdd.y] = newCell;
