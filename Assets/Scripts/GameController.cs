@@ -15,6 +15,7 @@ public class GameController : MonoBehaviour
     public int lightFrequency;
     private GridCellModel[,] grid;
     private List<Vector2Int> availableCells;
+    public GameObject victoryScreen;
 
     // Start is called before the first frame update
     void Start()
@@ -27,9 +28,17 @@ public class GameController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //bool mouseInput = Input.GetAxisRaw("Fire1") > 0.0;
-        //if (mouseInput)
-        //    InstantiateGrid();
+        
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Victory"))
+        {
+            victoryScreen.transform.GetChild(0).gameObject.SetActive(true);
+            victoryScreen.transform.GetChild(1).gameObject.SetActive(true);
+            victoryScreen.GetComponent<TimerController>().SetFinalTime();
+        }
     }
 
     void InstantiateGrid()
@@ -52,16 +61,19 @@ public class GameController : MonoBehaviour
                 if(cellTempLocation.x > 4 || cellTempLocation.x < -4 || cellTempLocation.z > 4 || cellTempLocation.z < -4)
                 {
                     cellTemp.transform.GetChild(0).gameObject.SetActive(gridTemp.NWallActive);
-                    cellTemp.transform.GetChild(1).gameObject.SetActive(gridTemp.SWallActive);
                     cellTemp.transform.GetChild(2).gameObject.SetActive(gridTemp.EWallActive);
-                    cellTemp.transform.GetChild(3).gameObject.SetActive(gridTemp.WWallActive);
+
+                    if (z == 0)
+                        cellTemp.transform.GetChild(1).gameObject.SetActive(true);
+                    if (x == 0)
+                        cellTemp.transform.GetChild(3).gameObject.SetActive(true);
                 }
                 else
                 {
                     cellTemp.transform.GetChild(0).gameObject.SetActive(false);
-                    cellTemp.transform.GetChild(1).gameObject.SetActive(false);
+                    //cellTemp.transform.GetChild(1).gameObject.SetActive(false);
                     cellTemp.transform.GetChild(2).gameObject.SetActive(false);
-                    cellTemp.transform.GetChild(3).gameObject.SetActive(false);
+                    //cellTemp.transform.GetChild(3).gameObject.SetActive(false);
                 }
 
                 //Set Enemies

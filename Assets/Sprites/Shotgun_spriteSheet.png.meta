@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 350e86ca28e26c543a742e8ebc66090a
+guid: 3cc754de9e426fa4f92de66a04d287b7
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -48,7 +48,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 16
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -100,42 +100,20 @@ TextureImporter:
       name: Shotgun_0
       rect:
         serializedVersion: 2
-        x: 41
+        x: 3
         y: 2
         width: 79
         height: 60
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ea53a670ac5a7994e86e199758ca422f
-      internalID: -1409059073
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Shotgun_Icon
-      rect:
-        serializedVersion: 2
-        x: 41
-        y: 65
-        width: 63
-        height: 13
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 1}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 14d416ee9ab86304e91ecb9a5bd3faca
-      internalID: -708131913
+      spriteID: 59b4882be0eabb14ba087485f67ff835
+      internalID: 943538907
       vertices: []
       indices: 
       edges: []
@@ -144,64 +122,20 @@ TextureImporter:
       name: Shotgun_1
       rect:
         serializedVersion: 2
-        x: 123
+        x: 85
         y: 2
-        width: 119
-        height: 121
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 79
+        height: 73
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 550f33b85e2661a439938b052a9642ff
-      internalID: 644346089
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Shotgun_Fire_0
-      rect:
-        serializedVersion: 2
-        x: 141
-        y: 126
-        width: 44
-        height: 31
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 57904e8ddab1589439b1541c50cd6f0e
-      internalID: 2029060406
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Shotgun_Fire_1
-      rect:
-        serializedVersion: 2
-        x: 188
-        y: 126
-        width: 54
-        height: 44
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: fbd923f7e2f9e404cab2b4c481c83367
-      internalID: 640197833
+      spriteID: ff281d27fd93569438091e5a0ce76a07
+      internalID: 2128571439
       vertices: []
       indices: 
       edges: []
@@ -210,20 +144,20 @@ TextureImporter:
       name: Shotgun_2
       rect:
         serializedVersion: 2
-        x: 245
+        x: 167
         y: 2
-        width: 87
-        height: 151
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 79
+        height: 82
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ff72a5fa13ead464daac0ac1c4aad78f
-      internalID: -829425337
+      spriteID: b5f676fc6beebd244b3df19d21441bcd
+      internalID: -529645512
       vertices: []
       indices: 
       edges: []
@@ -232,20 +166,64 @@ TextureImporter:
       name: Shotgun_3
       rect:
         serializedVersion: 2
-        x: 335
+        x: 249
         y: 2
-        width: 113
-        height: 131
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 119
+        height: 121
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: cca254efbcf1463419dbdae8cd382839
-      internalID: 1828397486
+      spriteID: babac4689096fb046b71b0f8f2bf79d8
+      internalID: 1517054215
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Shotgun_4
+      rect:
+        serializedVersion: 2
+        x: 371
+        y: 2
+        width: 87
+        height: 151
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b51f2e70816086f44b7f0064d95d0dc7
+      internalID: 289255213
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Shotgun_5
+      rect:
+        serializedVersion: 2
+        x: 461
+        y: 2
+        width: 113
+        height: 131
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3b7caba45023d9a4d9674e163e16e443
+      internalID: -516003797
       vertices: []
       indices: 
       edges: []
@@ -254,7 +232,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 2df0994a0ca2c9f4091f82dc51c27259
+    spriteID: c7a5758558986f445b701f93a8612b2f
     internalID: 0
     vertices: []
     indices: 
@@ -264,13 +242,14 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Shotgun_0: -1409059073
-      Shotgun_1: 644346089
-      Shotgun_2: -829425337
-      Shotgun_3: 1828397486
-      Shotgun_Fire_0: 2029060406
-      Shotgun_Fire_1: 640197833
-      Shotgun_Icon: -708131913
+      Shotgun_0: 943538907
+      Shotgun_1: 2128571439
+      Shotgun_2: -529645512
+      Shotgun_3: 1517054215
+      Shotgun_4: 289255213
+      Shotgun_5: -516003797
+      Shotgun_6: -1680619983
+      Shotgun_7: 898719921
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
