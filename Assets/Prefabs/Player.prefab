@@ -303,6 +303,7 @@ GameObject:
   - component: {fileID: 4908488988109900457}
   - component: {fileID: 4617402176600540925}
   - component: {fileID: 4331210895647705924}
+  - component: {fileID: 1392101250479502581}
   - component: {fileID: 4908488988109900458}
   - component: {fileID: 4908488988109900459}
   m_Layer: 3
@@ -361,7 +362,7 @@ MonoBehaviour:
   victory: {fileID: 2844451526991821811, guid: ec8f2b5adf9f93544a926e376f264df1, type: 3}
   gridSizeX: 32
   gridSizeZ: 32
-  enemySpawnRate: 8
+  enemySpawnRate: 7
   lightFrequency: 5
   victoryScreen: {fileID: 2619193249869460758}
 --- !u!114 &4617402176600540925
@@ -393,6 +394,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sensitivity: 2
+  player: {fileID: 4908488988109900452}
+--- !u!114 &1392101250479502581
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4908488988109900452}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 628106d777863f244810119c26baafdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   player: {fileID: 4908488988109900452}
 --- !u!143 &4908488988109900458
 CharacterController:

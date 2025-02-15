@@ -5,17 +5,19 @@ using UnityEngine;
 public class EnemyController : MonoBehaviour
 {
     public float cooldownTime = 5f;
-    public Transform playerTransform;
-    public Animator animator;
-
-    private Vector3 pathTarget;
     public float cooldown = 0f;
+
+    private Transform playerTransform;
+    private Animator animator;
+    private Vector3 pathTarget;
     private bool activated = false;
     private bool? mirrored = null;
+    private Quaternion baseRotate;
 
     void Start()
     {
         playerTransform = GameObject.Find("Player").transform;
+        animator = transform.GetComponentInChildren<Animator>();
     }
 
     void Update()
@@ -44,7 +46,7 @@ public class EnemyController : MonoBehaviour
         else
             cooldown -= Time.deltaTime;
 
-        //hear player on Fire
+        //hear player Fire
         if (activated)
         {
             bool playerFireInput = Input.GetButtonDown("Fire1");
@@ -77,12 +79,14 @@ public class EnemyController : MonoBehaviour
         animator.SetBool("Stun", runAnimation);
         if (activateStun)
         {
+            baseRotate = monkey.rotation;
             mirrored = Random.Range(0, 2) == 0;
-            monkey.Rotate(new Vector3(15f, 15f * (mirrored.Value ? 1 : -1), 0f));
+            monkey.Rotate(new Vector3(15f, 15f * (mirrored.Value ? 1f : -1f), 0f));
         }
         else
         {
-            monkey.Rotate(new Vector3(-15f, 15f * (!mirrored.Value ? 1 : -1), 0f));
+            //monkey.Rotate(new Vector3(-15f, 15f * (!mirrored.Value ? 1f : -1f), 0f));
+            monkey.rotation = baseRotate;
             mirrored = null;
         }
     }

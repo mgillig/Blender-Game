@@ -10,6 +10,9 @@ public class PlayerController : MonoBehaviour
     public GameObject player;
     public float speed = 6f;
     public Animator shotgunAnimator;
+    public bool enableMove = false;
+    public bool enableFire = true;
+    public bool gameStart = false;
     private int health;
     private PlayerHealth playerHealth;
 
@@ -23,16 +26,19 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        float verticalInput = Input.GetAxisRaw("Vertical");
-        float horizontalInput = Input.GetAxisRaw("Horizontal");
-        bool fireInput = Input.GetButtonDown("Fire1");
-
-        var moveDirection = Quaternion.Euler(0f, transform.eulerAngles.y, 0f) * new Vector3(horizontalInput, 0, verticalInput);
-        moveDirection.Normalize();
-        controller.Move(speed * Time.deltaTime * moveDirection);
-        if (fireInput)
+        if (enableMove)
         {
-            fire();
+            float verticalInput = Input.GetAxisRaw("Vertical");
+            float horizontalInput = Input.GetAxisRaw("Horizontal");
+            var moveDirection = Quaternion.Euler(0f, transform.eulerAngles.y, 0f) * new Vector3(horizontalInput, 0, verticalInput);
+            moveDirection.Normalize();
+            controller.Move(speed * Time.deltaTime * moveDirection);
+        }
+        if (enableFire)
+        {
+            bool fireInput = Input.GetButtonDown("Fire1");
+            if (fireInput)
+                fire();
         }
     }
 
@@ -57,8 +63,11 @@ public class PlayerController : MonoBehaviour
             if (Physics.Raycast(transform.position, Quaternion.Euler(0f, transform.eulerAngles.y, 0f) * Vector3.forward, out hit))
             {
                 var enemyController = hit.collider.gameObject.GetComponent<EnemyController>();
+                var cubeController = hit.collider.gameObject.GetComponent<DefaultCubeController>();
                 if (enemyController != null)
                     enemyController.TriggerStun(true);
+                else if(cubeController != null)
+                    cubeController.TriggerStart();
             }
         }
     }

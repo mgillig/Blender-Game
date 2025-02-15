@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PointLightSpriteController : MonoBehaviour
+public class FacePlayer : MonoBehaviour
 {
     private Transform playerPosition;
 

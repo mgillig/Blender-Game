@@ -8,6 +8,8 @@ public class MouseController : MonoBehaviour
     public float sensitivity = 2.0f;
     public GameObject player;
 
+    private bool enableCamera = false;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -17,7 +19,19 @@ public class MouseController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        float mouseX = Input.GetAxis("Mouse X");
-        player.transform.Rotate(new Vector3(0f, sensitivity * mouseX, 0f));
+        if (enableCamera)
+        {
+            float mouseX = Input.GetAxis("Mouse X");
+            player.transform.Rotate(new Vector3(0f, sensitivity * mouseX, 0f));
+        }
+    }
+
+    public void SetMouseMode(bool allowCameraRotate, bool lockMouse)
+    {
+        enableCamera = allowCameraRotate;
+        if(lockMouse)
+            Cursor.lockState = CursorLockMode.Locked;
+        else
+            Cursor.lockState = CursorLockMode.None;
     }
 }

@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Skybox
-  m_Shader: {fileID: 104, guid: 0000000000000000f000000000000000, type: 0}
+  m_Shader: {fileID: 103, guid: 0000000000000000f000000000000000, type: 0}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -79,6 +79,10 @@ Material:
         m_Texture: {fileID: 2800000, guid: f84ea55a9fc860542ab0b38f4f1ff5c2, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _Tex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _UpTex:
         m_Texture: {fileID: 2800000, guid: f84ea55a9fc860542ab0b38f4f1ff5c2, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -106,6 +110,6 @@ Material:
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _Tint: {r: 0.254717, g: 0.254717, b: 0.254717, a: 0.5}
+    - _Tint: {r: 0.21176472, g: 0.21176472, b: 0.21176472, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
