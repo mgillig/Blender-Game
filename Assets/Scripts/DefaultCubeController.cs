@@ -17,7 +17,7 @@ public class DefaultCubeController : MonoBehaviour
 
     public void TriggerStart()
     {
-        gameStart.triggerStart();
+        gameStart.TriggerStart();
         this.gameObject.SetActive(false);
     }
 }

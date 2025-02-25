@@ -12,53 +12,130 @@ public class GridController : MonoBehaviour
     public GameObject wall;
     public GameObject enemy;
     public GameObject victory;
-    public int gridSizeX;
-    public int gridSizeZ;
+    public int gridSize;
     public int enemySpawnRate;
     public int lightFrequency;
+    public GameObject victoryScreen;
+    public GameObject mazeEntitiesParent;
+
     private GridCellModel[,] grid;
     private List<Vector2Int> availableCells;
-    public GameObject victoryScreen;
+    private Dictionary<int, List<GameObject>> wallLayers = new Dictionary<int, List<GameObject>>();
+    private bool gridActivationTrigger = false;
+    private bool activateGrid = false;
 
     // Start is called before the first frame update
     void Start()
     {
-        grid = new GridCellModel[gridSizeX, gridSizeZ];
+        grid = new GridCellModel[gridSize, gridSize];
         GenerateMaze();
-        //InstantiateGrid();
+        BuildGrid();
     }
 
     // Update is called once per frame
     void Update()
     {
-        
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Victory"))
+        if (activateGrid)
         {
-            victoryScreen.transform.GetChild(0).gameObject.SetActive(true);
-            victoryScreen.transform.GetChild(1).gameObject.SetActive(true);
-            victoryScreen.GetComponent<TimerController>().SetFinalTime();
+            StartCoroutine(ActivateGridCoroutine());
+            activateGrid = false;
         }
     }
 
-    public void InstantiateGrid()
+    public List<Vector3> GetPath(Vector3 start, Vector3 destination)
     {
-        int centerX = grid.GetLength(0) / 2;
-        int centerZ = grid.GetLength(1) / 2;
+        var path = new List<Vector3>();
+        var startGridCell = GetGridCellFromPosition(start);
+        var destinationGridCell = GetGridCellFromPosition(destination);
+        var tempGridCell = startGridCell;
+        while(tempGridCell != destinationGridCell)
+        {
+            //move in +X
+            if(tempGridCell.x < destinationGridCell.x &&
+                !grid[tempGridCell.x, tempGridCell.y].NWallActive)
+                tempGridCell.x++;
+            //move in -X
+            else if(tempGridCell.x > destinationGridCell.x &&
+                !grid[tempGridCell.x, tempGridCell.y].SWallActive)
+                tempGridCell.x--;
+            //move in +Y
+            else if (tempGridCell.y < destinationGridCell.y &&
+                !grid[tempGridCell.x, tempGridCell.y].EWallActive)
+                tempGridCell.y++;
+            //move in -Y
+            else if (tempGridCell.y > destinationGridCell.y &&
+                !grid[tempGridCell.x, tempGridCell.y].WWallActive)
+                tempGridCell.y--;
+            else
+            {
+                if(!grid[tempGridCell.x, tempGridCell.y].NWallActive)
+                    tempGridCell.x++;
+                else if (!grid[tempGridCell.x, tempGridCell.y].SWallActive)
+                    tempGridCell.x--;
+                else if (!grid[tempGridCell.x, tempGridCell.y].EWallActive)
+                    tempGridCell.y++;
+                else
+                    tempGridCell.y--;
+            }
+
+            var tempGridCellPosition = GetGridCellPosition(tempGridCell);
+            if(path.Any(x => x == tempGridCellPosition))
+            {
+                var indexOfDuplicate = path.IndexOf(tempGridCellPosition);
+                path.RemoveRange(indexOfDuplicate, path.Count - indexOfDuplicate);
+            }
+            path.Add(tempGridCellPosition);
+        }
+
+        return path;
+    }
+
+    private Vector2Int GetGridCellFromPosition(Vector3 position)
+    {
+        return new Vector2Int((int)(position.x / wall.transform.localScale.x) + (gridSize / 2), (int)(position.z / wall.transform.localScale.x) + (gridSize / 2));
+    }
+
+    private Vector3 GetGridCellPosition(Vector2Int gridCell)
+    {
+        return new Vector3((gridCell.x - (gridSize / 2)) * wall.transform.localScale.x, 1, (gridCell.y - (gridSize / 2)) * wall.transform.localScale.x);
+    }
+
+    public void ActivateGrid()
+    {
+        if (!gridActivationTrigger)
+            activateGrid = true;
+        gridActivationTrigger = true;
+    }
+
+    private IEnumerator ActivateGridCoroutine()
+    {
+        foreach (var layer in wallLayers)
+        {
+            foreach (var wall in layer.Value)
+            {
+                wall.SetActive(true);
+            }
+            yield return new WaitForSeconds(.01f);
+        }
+        mazeEntitiesParent.SetActive(true);
+    }
+
+    public void BuildGrid()
+    {
+        //int centerX = grid.GetLength(0) / 2;
+        //int centerZ = grid.GetLength(1) / 2;
         float wallSize = wall.transform.localScale.x;
         int victorySide = Random.Range(0, 4);
+        wall.SetActive(false);
 
         for (int z = 0; z < grid.GetLength(1); z++)
         {
             for (int x = 0; x < grid.GetLength(0); x++)
             {
-                if (x > (gridSizeX / 2) - 1 && x < (gridSizeX / 2) + 1 && z > (gridSizeZ / 2) - 1 && z < (gridSizeZ / 2) + 1)
+                if (x > (gridSize / 2) - 1 && x < (gridSize / 2) + 1 && z > (gridSize / 2) - 1 && z < (gridSize / 2) + 1)
                     continue;
                 var gridCell = grid[x, z];
-                var cellLocation = new Vector3((x - centerX) * wallSize, 1, (z - centerZ) * wallSize);
+                var cellLocation = GetGridCellPosition(new Vector2Int(x, z));
                 //build walls
                 //S and W walls
                 if (gridCell.SWallActive)
@@ -66,7 +143,12 @@ public class GridController : MonoBehaviour
                     wall.name = "wall (" + x + ", " + z + ") S";
                     var wallLocation = new Vector3(cellLocation.x, cellLocation.y, cellLocation.z - (wallSize / 2));
                     var wallRotation = new Quaternion(0f, z % 2 == 0 ? 0f : 180f, 0f, 0f);
-                    Instantiate(wall, wallLocation, wallRotation);
+                    //wallLayers.Add((int)cellLocation.x * -1, Instantiate(wall, wallLocation, wallRotation));
+                    var newWall = Instantiate(wall, wallLocation, wallRotation);
+                    if (wallLayers.ContainsKey((int)cellLocation.x * -1))
+                        wallLayers[(int)cellLocation.x * -1].Add(newWall);
+                    else
+                        wallLayers.Add((int)cellLocation.x * -1, new List<GameObject>() { newWall });
                 }
                 if (gridCell.WWallActive)
                 {
@@ -75,6 +157,10 @@ public class GridController : MonoBehaviour
                     //var wallRotation = new Quaternion(0f, 0f, 0f, 0f);
                     var newWall = Instantiate(wall, wallLocation, new Quaternion());
                     newWall.transform.Rotate(new Vector3(0f, x % 2 == 0 ? 90f : -90f, 0f));
+                    if (wallLayers.ContainsKey((int)cellLocation.z * -1))
+                        wallLayers[(int)cellLocation.z * -1].Add(newWall);
+                    else
+                        wallLayers.Add((int)cellLocation.z * -1, new List<GameObject>() { newWall });
                 }
 
                 //N and E walls
@@ -84,7 +170,12 @@ public class GridController : MonoBehaviour
                     wall.name = "wall (" + x + ", " + z + ") N";
                     var wallLocation = new Vector3(cellLocation.x, cellLocation.y, cellLocation.z + (wallSize / 2));
                     var wallRotation = new Quaternion(0f, z + 1 % 2 == 0 ? 0f : 180f, 0f, 0f);
-                    Instantiate(wall, wallLocation, wallRotation);
+                    //wallLayers.Add((int)cellLocation.x * -1, Instantiate(wall, wallLocation, wallRotation));
+                    var newWall = Instantiate(wall, wallLocation, wallRotation);
+                    if (wallLayers.ContainsKey((int)cellLocation.x * -1))
+                        wallLayers[(int)cellLocation.x * -1].Add(newWall);
+                    else
+                        wallLayers.Add((int)cellLocation.x * -1, new List<GameObject>() { newWall });
                 }
                 if (x == grid.GetLength(0) - 1 && gridCell.EWallActive)
                 {
@@ -93,6 +184,10 @@ public class GridController : MonoBehaviour
                     //var wallRotation = new Quaternion(0f, 0f, 0f, 0f);
                     var newWall = Instantiate(wall, wallLocation, new Quaternion());
                     newWall.transform.Rotate(new Vector3(0f, x + 1 % 2 == 0 ? 90f : -90f, 0f));
+                    if (wallLayers.ContainsKey((int)cellLocation.z * -1))
+                        wallLayers[(int)cellLocation.z * -1].Add(newWall);
+                    else
+                        wallLayers.Add((int)cellLocation.z * -1, new List<GameObject>() { newWall });
                 }
 
                 
@@ -103,16 +198,16 @@ public class GridController : MonoBehaviour
                     (victorySide == 2 && x == grid.GetLength(0) - 1 && z == 0) || 
                     (victorySide == 3 && x == grid.GetLength(0) - 1 && z == grid.GetLength(1) - 1) )
                 {
-                    Instantiate(victory, cellLocation, new Quaternion());
+                    Instantiate(victory, cellLocation, new Quaternion(), mazeEntitiesParent.transform);
                     continue;
                 }
 
                 //Set Enemies
                 if ((gridCell.NWallActive ? 1 : 0) + (gridCell.SWallActive ? 1 : 0) + (gridCell.EWallActive ? 1 : 0) + (gridCell.WWallActive ? 1 : 0) == 3 &&
-                    (x > (gridSizeX / 2) + 1 || x < (gridSizeX / 2) - 1 || z > (gridSizeZ / 2) + 1 || z < (gridSizeZ / 2) - 1) &&
+                    (x > (gridSize / 2) + 1 || x < (gridSize / 2) - 1 || z > (gridSize / 2) + 1 || z < (gridSize / 2) - 1) &&
                     Random.Range(0, enemySpawnRate) == 0)
                 {
-                    Instantiate(enemy, cellLocation, new Quaternion());
+                    Instantiate(enemy, cellLocation, new Quaternion(), mazeEntitiesParent.transform);
                 }
 
                 ////Build Lights
@@ -164,7 +259,7 @@ public class GridController : MonoBehaviour
                 IsFrontier = false
             };
 
-            if(frontierToAdd.x > ((float)grid.GetLength(0) / 2f) - 2f && frontierToAdd.x < ((float)grid.GetLength(0) / 2f) + 2f &&
+            if(frontierToAdd.x > ((float)grid.GetLength(0) / 2f) - 1f && frontierToAdd.x < ((float)grid.GetLength(0) / 2f) + 3f &&
                 frontierToAdd.y > ((float)grid.GetLength(1) / 2f) - 2f && frontierToAdd.y < ((float)grid.GetLength(1) / 2f) + 2f)
             {
                 newCell.SWallActive = false;
@@ -233,7 +328,7 @@ public class GridController : MonoBehaviour
         var wNeighbor = new Vector2Int(currentCell.x - 1, currentCell.y);
 
         //nNeighbor
-        if (nNeighbor.y < gridSizeZ && (grid[nNeighbor.x, nNeighbor.y] == null || grid[nNeighbor.x, nNeighbor.y].IsFrontier))
+        if (nNeighbor.y < gridSize && (grid[nNeighbor.x, nNeighbor.y] == null || grid[nNeighbor.x, nNeighbor.y].IsFrontier))
         {
             neighbors.Add(nNeighbor);
             if (grid[nNeighbor.x, nNeighbor.y] == null)
@@ -247,7 +342,7 @@ public class GridController : MonoBehaviour
                 grid[sNeighbor.x, sNeighbor.y] = new GridCellModel();
         }
         //eNeighbor
-        if (eNeighbor.x < gridSizeX && (grid[eNeighbor.x, eNeighbor.y] == null || grid[eNeighbor.x, eNeighbor.y].IsFrontier))
+        if (eNeighbor.x < gridSize && (grid[eNeighbor.x, eNeighbor.y] == null || grid[eNeighbor.x, eNeighbor.y].IsFrontier))
         {
             neighbors.Add(eNeighbor);
             if (grid[eNeighbor.x, eNeighbor.y] == null)

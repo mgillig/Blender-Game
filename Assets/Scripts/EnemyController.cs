@@ -1,61 +1,100 @@
 using System.ComponentModel.Design.Serialization;
+using Unity.Burst.CompilerServices;
 using UnityEditor.PackageManager;
 using UnityEngine;
+using UnityEngine.Timeline;
+using static UnityEngine.GraphicsBuffer;
 
 public class EnemyController : MonoBehaviour
 {
-    public float cooldownTime = 5f;
-    public float cooldown = 0f;
+    public float cooldownTime;
+    public float cooldown;
+    public float primeDistance;
+    public float speed;
+    public AudioClip activationSound;
+    public AudioClip biteSound;
+    public AudioClip stunSound;
 
-    private Transform playerTransform;
-    private Animator animator;
     private Vector3 pathTarget;
-    private bool activated = false;
     private bool? mirrored = null;
     private Quaternion baseRotate;
+    private AudioSource audioSource;
+    private Transform playerTransform;
+    private bool activated = false;
+    private bool primed;
+    private bool neverPlayedAudio = true;
+    private GridController grid;
+
+
+    //[SerializeField] private bool activated = false;
 
     void Start()
     {
-        playerTransform = GameObject.Find("Player").transform;
-        animator = transform.GetComponentInChildren<Animator>();
+        var player = GameObject.Find("Player");
+        playerTransform = player.transform;
+        grid = player.GetComponent<GridController>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     void Update()
     {
         if (cooldown <= 0f)
         {
+            primed = Vector3.Distance(transform.position, playerTransform.position) < primeDistance;
+
             if (mirrored.HasValue)
                 RunStunAnimation(false);
 
-            Vector3 direction = (this.transform.position - playerTransform.position).normalized * -1;
-            RaycastHit hit;
-            if (Physics.Raycast(transform.position, direction, out hit))
-            {
-                if (hit.collider.gameObject.CompareTag("Player"))
-                {
-                    if (!activated)
-                    {
-                        activated = true;
-                    }
-                    pathTarget = hit.point;
-                    transform.LookAt(pathTarget);
-                }
-            }
-            //pathfinding goes here
+            SeePlayer();
+            HearPlayer();
+            Movement();
         }
         else
             cooldown -= Time.deltaTime;
+    }
 
-        //hear player Fire
-        if (activated)
+    private void SeePlayer()
+    {
+        Vector3 direction = (this.transform.position - playerTransform.position).normalized * -1;
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, direction, out hit))
+        {
+            if (hit.collider.gameObject.CompareTag("Player"))
+            {
+                if (neverPlayedAudio)
+                {
+                    neverPlayedAudio = false;
+                    audioSource.clip = activationSound;
+                    audioSource.Play();
+                }
+                activated = true;
+                pathTarget = hit.point;
+                transform.LookAt(pathTarget);
+            }
+        }
+    }
+
+    private void HearPlayer()
+    {
+        if (primed || activated)
         {
             bool playerFireInput = Input.GetButtonDown("Fire1");
             if (playerFireInput)
             {
+                activated = true;
                 pathTarget = playerTransform.position;
                 transform.LookAt(pathTarget);
+                grid.GetPath(transform.position, pathTarget);
             }
         }
+    }
+
+    private void Movement()
+    {
+        if (activated)
+        {
+            //transform.position = Vector3.MoveTowards(transform.position, pathTarget, speed * Time.deltaTime);
+        } 
     }
 
     public bool IsActive()
@@ -69,6 +108,17 @@ public class EnemyController : MonoBehaviour
         {
             cooldown = cooldownTime;
             RunStunAnimation(wasAttacked);
+
+            if (!wasAttacked)
+            {
+                audioSource.clip = biteSound;
+                audioSource.Play();
+            }
+            else
+            {
+                audioSource.clip = stunSound;
+                audioSource.Play();
+            }
         }
     }
 
@@ -76,7 +126,7 @@ public class EnemyController : MonoBehaviour
     {
         var activateStun = !mirrored.HasValue;
         var monkey = transform.GetChild(0);
-        animator.SetBool("Stun", runAnimation);
+        //animator.SetBool("Stun", runAnimation);
         if (activateStun)
         {
             baseRotate = monkey.rotation;
@@ -85,7 +135,6 @@ public class EnemyController : MonoBehaviour
         }
         else
         {
-            //monkey.Rotate(new Vector3(-15f, 15f * (!mirrored.Value ? 1f : -1f), 0f));
             monkey.rotation = baseRotate;
             mirrored = null;
         }

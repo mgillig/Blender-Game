@@ -15,12 +15,14 @@ public class PlayerController : MonoBehaviour
     public bool gameStart = false;
     private int health;
     private PlayerHealth playerHealth;
+    private AudioSource audioSource;
 
     // Start is called before the first frame update
     void Start()
     {
         playerHealth = GetComponentInChildren<PlayerHealth>();
         health = playerHealth.GetMaxHealth();
+        audioSource = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -58,6 +60,7 @@ public class PlayerController : MonoBehaviour
         if (shotgunAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Ready"))
         {
             shotgunAnimator.SetTrigger("Fire");
+            audioSource.Play();
             RaycastHit hit;
             //Debug.DrawRay(transform.position, Quaternion.Euler(0f, transform.eulerAngles.y, 0f) * Vector3.forward, Color.red);
             if (Physics.Raycast(transform.position, Quaternion.Euler(0f, transform.eulerAngles.y, 0f) * Vector3.forward, out hit))
