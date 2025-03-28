@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour
 {
+    public bool gameActive = false;
     public GameObject player;
     private CharacterController characterController;
     private GridController gridController;
@@ -23,6 +24,7 @@ public class GameController : MonoBehaviour
 
     public void TriggerStart()
     {
+        gameActive = true;
         gridController.ActivateGrid();
         mouseController.SetMouseMode(true, true);
         playerController.enableMove = true;
@@ -31,5 +33,13 @@ public class GameController : MonoBehaviour
         if(gridLines != null)
             gridLines.transform.Translate(0f, gridLines.transform.position.y * -1, 0f);
 
+    }
+
+    public void PauseGame()
+    {
+        gameActive = false;
+        playerController.enableMove = false;
+        playerController.enableFire = false;
+        mouseController.SetMouseMode(false, false);
     }
 }

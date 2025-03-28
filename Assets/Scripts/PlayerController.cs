@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 public class PlayerController : MonoBehaviour
@@ -13,9 +14,14 @@ public class PlayerController : MonoBehaviour
     public bool enableMove = false;
     public bool enableFire = true;
     public bool gameStart = false;
+    public AudioClip fireSound;
+    public AudioClip deathSound;
+
     private int health;
     private PlayerHealth playerHealth;
     private AudioSource audioSource;
+    private GameController gameController;
+    private bool endGame = false;
 
     // Start is called before the first frame update
     void Start()
@@ -23,6 +29,7 @@ public class PlayerController : MonoBehaviour
         playerHealth = GetComponentInChildren<PlayerHealth>();
         health = playerHealth.GetMaxHealth();
         audioSource = GetComponent<AudioSource>();
+        gameController = GetComponent<GameController>();
     }
 
     // Update is called once per frame
@@ -40,26 +47,43 @@ public class PlayerController : MonoBehaviour
         {
             bool fireInput = Input.GetButtonDown("Fire1");
             if (fireInput)
-                fire();
+                Fire();
         }
+        if(endGame && !audioSource.isPlaying)
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
+
     }
 
     private void OnTriggerEnter(Collider other)
     {
         var enemyController = other.gameObject.GetComponent<EnemyController>();
-        if(enemyController != null && enemyController.IsActive())
+        if(enemyController != null && enemyController.IsActive() && gameController.gameActive)
         {
             health--;
             playerHealth.SetHealth(health);
+            if(health == 0)
+                Die();
             enemyController.TriggerStun(false);
         }
     }
 
-    private void fire()
+    private void Die()
+    {
+        transform.GetChild(1).GetChild(2).GetChild(0).gameObject.SetActive(true);
+        audioSource.clip = deathSound;
+        audioSource.Play();
+        gameController.PauseGame();
+        endGame = true;
+    }
+
+    private void Fire()
     {
         if (shotgunAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Ready"))
         {
             shotgunAnimator.SetTrigger("Fire");
+            audioSource.clip = fireSound;
             audioSource.Play();
             RaycastHit hit;
             //Debug.DrawRay(transform.position, Quaternion.Euler(0f, transform.eulerAngles.y, 0f) * Vector3.forward, Color.red);

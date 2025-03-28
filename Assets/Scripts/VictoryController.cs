@@ -15,14 +15,9 @@ public class VictoryController : MonoBehaviour
     {
         if (other.CompareTag("Player") && !hasWon)
         {
-            var playerController = other.GetComponent<PlayerController>();
-            var mouseController = other.GetComponent<MouseController>();
-            if (playerController != null)
-            {
-                playerController.enableMove = true;
-                playerController.enableFire = true;
-                mouseController.SetMouseMode(false, false);
-            }
+            var gameController = other.GetComponent<GameController>();
+            if (gameController != null)
+                gameController.PauseGame();
             var victoryScreen = other.gameObject.transform.GetChild(1).GetChild(1);
             victoryScreen.GetChild(0).gameObject.SetActive(true);
             victoryScreen.GetChild(1).gameObject.SetActive(true);

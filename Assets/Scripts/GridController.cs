@@ -15,7 +15,6 @@ public class GridController : MonoBehaviour
     public int gridSize;
     public int enemySpawnRate;
     public int lightFrequency;
-    public GameObject victoryScreen;
     public GameObject mazeEntitiesParent;
 
     private GridCellModel[,] grid;
@@ -42,60 +41,78 @@ public class GridController : MonoBehaviour
         }
     }
 
-    public List<Vector3> GetPath(Vector3 start, Vector3 destination)
+    public List<Vector2Int> GetPath(Vector3 start, Vector2Int destination)
     {
-        var path = new List<Vector3>();
         var startGridCell = GetGridCellFromPosition(start);
-        var destinationGridCell = GetGridCellFromPosition(destination);
-        var tempGridCell = startGridCell;
-        while(tempGridCell != destinationGridCell)
-        {
-            //move in +X
-            if(tempGridCell.x < destinationGridCell.x &&
-                !grid[tempGridCell.x, tempGridCell.y].NWallActive)
-                tempGridCell.x++;
-            //move in -X
-            else if(tempGridCell.x > destinationGridCell.x &&
-                !grid[tempGridCell.x, tempGridCell.y].SWallActive)
-                tempGridCell.x--;
-            //move in +Y
-            else if (tempGridCell.y < destinationGridCell.y &&
-                !grid[tempGridCell.x, tempGridCell.y].EWallActive)
-                tempGridCell.y++;
-            //move in -Y
-            else if (tempGridCell.y > destinationGridCell.y &&
-                !grid[tempGridCell.x, tempGridCell.y].WWallActive)
-                tempGridCell.y--;
-            else
-            {
-                if(!grid[tempGridCell.x, tempGridCell.y].NWallActive)
-                    tempGridCell.x++;
-                else if (!grid[tempGridCell.x, tempGridCell.y].SWallActive)
-                    tempGridCell.x--;
-                else if (!grid[tempGridCell.x, tempGridCell.y].EWallActive)
-                    tempGridCell.y++;
-                else
-                    tempGridCell.y--;
-            }
 
-            var tempGridCellPosition = GetGridCellPosition(tempGridCell);
-            if(path.Any(x => x == tempGridCellPosition))
-            {
-                var indexOfDuplicate = path.IndexOf(tempGridCellPosition);
-                path.RemoveRange(indexOfDuplicate, path.Count - indexOfDuplicate);
-            }
-            path.Add(tempGridCellPosition);
-        }
+        var path = GetPath(startGridCell, destination);
+
+        drawDebugLines(path);
 
         return path;
     }
 
-    private Vector2Int GetGridCellFromPosition(Vector3 position)
+    private void drawDebugLines(List<Vector2Int> path)
+    {
+        for(int i = 0; i < path.Count - 1; i++)
+        {
+            Debug.DrawLine(GetGridCellPosition(path[i]), GetGridCellPosition(path[i + 1]), Color.red, 10000);
+        }
+    }
+
+    private List<Vector2Int> GetPath(Vector2Int start, Vector2Int destination)
+    {
+        var path = new List<GridCellNavModel>();
+        var currentCell = new GridCellNavModel(start);
+        var validNeighbors = GetValidNeighbors(currentCell.Location).OrderBy(x => Vector2Int.Distance(x, destination)).ToList();
+        currentCell.Frontier = validNeighbors.Count(x => !path.Any(y => y.Location == x));
+        path.Add(currentCell);
+        //var previousCell = new Vector2Int();
+        while (currentCell.Location != destination && currentCell != null)
+        {
+            if (currentCell.Frontier == 0)
+            {
+                currentCell = path.LastOrDefault(x => x.Frontier != 0);
+                if(currentCell == null)
+                    break;
+                validNeighbors = GetValidNeighbors(currentCell.Location).OrderBy(x => Vector2Int.Distance(x, destination)).Where(x => !path.Any(y => y.Location == x)).ToList();
+                //currentCell.Frontier = validNeighbors.Count();
+                var indexToRemove = path.IndexOf(currentCell) + 1;
+                var countToRemove = path.Count - indexToRemove;
+                path.RemoveRange(indexToRemove, countToRemove);
+            }
+            path[path.IndexOf(currentCell)].Frontier--;
+            currentCell = new GridCellNavModel(validNeighbors.FirstOrDefault());
+            validNeighbors = GetValidNeighbors(currentCell.Location).OrderBy(x => Vector2Int.Distance(x, destination)).Where(x => !path.Any(y => y.Location == x)).ToList();
+            currentCell.Frontier = validNeighbors.Count();
+            path.Add(currentCell);
+        }
+        return path.Select(x => x.Location).ToList();
+    }
+
+    private List<Vector2Int> GetValidNeighbors(Vector2Int currentCell)
+    {
+        var neighbors = new List<Vector2Int>();
+        var gridCell = grid[currentCell.x, currentCell.y];
+
+        if (!gridCell.NWallActive)
+            neighbors.Add(currentCell + Vector2Int.up);
+        if (!gridCell.SWallActive)
+            neighbors.Add(currentCell + Vector2Int.down);
+        if (!gridCell.EWallActive)
+            neighbors.Add(currentCell + Vector2Int.right);
+        if (!gridCell.WWallActive)
+            neighbors.Add(currentCell + Vector2Int.left);
+
+        return neighbors;
+    }
+
+    public Vector2Int GetGridCellFromPosition(Vector3 position)
     {
         return new Vector2Int((int)(position.x / wall.transform.localScale.x) + (gridSize / 2), (int)(position.z / wall.transform.localScale.x) + (gridSize / 2));
     }
 
-    private Vector3 GetGridCellPosition(Vector2Int gridCell)
+    public Vector3 GetGridCellPosition(Vector2Int gridCell)
     {
         return new Vector3((gridCell.x - (gridSize / 2)) * wall.transform.localScale.x, 1, (gridCell.y - (gridSize / 2)) * wall.transform.localScale.x);
     }
