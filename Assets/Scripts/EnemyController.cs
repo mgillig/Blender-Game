@@ -28,6 +28,10 @@ public class EnemyController : MonoBehaviour
     private GridController grid;
     private List<Vector2Int> destinationQueue = new List<Vector2Int>();
     private GameController gameController;
+    private PlayerController playerController;
+    
+    //debug properties
+    public bool selected = false;
 
 
     //[SerializeField] private bool activated = false;
@@ -39,34 +43,48 @@ public class EnemyController : MonoBehaviour
         grid = player.GetComponent<GridController>();
         audioSource = GetComponent<AudioSource>();
         gameController = player.GetComponent<GameController>();
-        home = grid.GetGridCellFromPosition(transform.position);
+        playerController = player.GetComponent<PlayerController>();
+        home = new Vector2Int((int)transform.position.x, (int)transform.position.z);
     }
 
     void Update()
     {
         if (gameController.gameActive)
         {
-            if (cooldown <= 0f)
+            if(!gameController.debugMode)
             {
-                if (mirrored.HasValue)
-                    RunStunAnimation(false);
-                if (!goHome)
+                if (cooldown <= 0f)
                 {
-                    SeePlayer();
-                    HearPlayer();
+                    if (mirrored.HasValue)
+                        RunStunAnimation(false);
+                    if (!goHome)
+                    {
+                        SeePlayer();
+                        HearPlayer();
+                    }
+                    //else if(grid.GetGridCellFromPosition(transform.position) == home)
+                    else if (new Vector2Int((int)transform.position.x, (int)transform.position.z) == home)
+                    {
+                        goHome = false;
+                        neverPlayedAudio = true;
+                    }
                 }
-                else if(grid.GetGridCellFromPosition(transform.position) == home)
+                else
                 {
-                    goHome = false;
-                    neverPlayedAudio = true;
+                    cooldown -= Time.deltaTime;
                 }
-            }
-            else
-            {
-                cooldown -= Time.deltaTime;
             }
 
-            Movement(cooldown <= 0f || !mirrored.HasValue);
+            Movement(cooldown <= 0f || !mirrored.HasValue || gameController.debugMode);
+        }
+    }
+
+    private void OnMouseOver()
+    {
+        if(gameController.debugMode && Input.GetButtonDown("Fire1"))
+        {
+            selected = true;
+            transform.GetChild(0).Rotate(-90f, 0f, 0f);
         }
     }
 
@@ -88,18 +106,19 @@ public class EnemyController : MonoBehaviour
         {
             if (hit.collider.gameObject.CompareTag("Player"))
             {
-                var gridCellPosition = grid.GetGridCellFromPosition(hit.point);
+                //var gridCellPosition = grid.GetGridCellFromPosition(hit.point);
+                var gridCellPosition = new Vector2Int((int)hit.point.x, (int)hit.point.z);
                 if(!destinationQueue.Any() || destinationQueue.LastOrDefault() != gridCellPosition)
                 {
-                    if (destinationQueue.Any()) {
-                       if (Vector2Int.Distance(gridCellPosition, destinationQueue.LastOrDefault()) <= 1)
-                            destinationQueue.Clear();
-                        destinationQueue.Add(gridCellPosition);
-                    }
-                    else if(Vector2Int.Distance(gridCellPosition, grid.GetGridCellFromPosition(transform.position)) > 1)
-                    {
+                    var currentPosition = new Vector2Int((int)transform.position.x, (int)transform.position.z);
+                    print("I am at " + currentPosition + " and am looking at the player at " + gridCellPosition);
+                    if (destinationQueue.Any() && Vector2Int.Distance(destinationQueue.LastOrDefault(), currentPosition) > Vector2Int.Distance(gridCellPosition, currentPosition))
+                        destinationQueue.Clear();
+                    if (!destinationQueue.Any() && Vector2Int.Distance(gridCellPosition, currentPosition) > 1)
                         destinationQueue = grid.GetPath(transform.position, gridCellPosition);
-                    }
+                    else
+                        destinationQueue.Add(gridCellPosition);
+
                     if (neverPlayedAudio)
                     {
                         neverPlayedAudio = false;
@@ -112,16 +131,37 @@ public class EnemyController : MonoBehaviour
         }
     }
 
-    private void HearPlayer()
+    //for debug
+    public void DebugHearPlayer(Vector2Int targetGridCell)
     {
-        if (Vector3.Distance(transform.position, playerTransform.position) < earShot)
+        HearPlayer(targetGridCell);
+    }
+
+    private void HearPlayer(Vector2Int? targetGridCell = null)
+    {
+        if (Vector3.Distance(transform.position, playerTransform.position) < earShot && !targetGridCell.HasValue)
         {
             bool playerFireInput = Input.GetButtonDown("Fire1");
-            if (playerFireInput)
+            if (playerFireInput && playerController.enableFire)
             {
                 activated = true;
-                destinationQueue = grid.GetPath(transform.position, grid.GetGridCellFromPosition(playerTransform.position));
+                //var playerGridCellPosition = grid.GetGridCellFromPosition(playerTransform.position);
+                //var currentPosition = grid.GetGridCellFromPosition(transform.position);
+                var playerGridCellPosition = new Vector2Int((int)playerTransform.position.x, (int)playerTransform.position.z);
+                var currentPosition = new Vector2Int((int)transform.position.x, (int)transform.position.z);
+                print("I am at " + currentPosition + " and hear the player at " + playerGridCellPosition);
+                //print(playerGridCellPosition);
+                destinationQueue = grid.GetPath(transform.position, playerGridCellPosition);
             }
+        }
+        else if (targetGridCell.HasValue)
+        {
+            activated = true;
+            var currentPosition = new Vector2Int((int)transform.position.x, (int)transform.position.z);
+            print("I am at " + currentPosition + " and hear the player at " + targetGridCell.Value);
+            destinationQueue = grid.GetPath(transform.position, targetGridCell.Value);
+            selected = false; 
+            transform.GetChild(0).Rotate(90f, 0f, 0f);
         }
     }
 
@@ -129,9 +169,10 @@ public class EnemyController : MonoBehaviour
     {
         if (activated && destinationQueue.Any())
         {
-            var target = grid.GetGridCellPosition(destinationQueue.FirstOrDefault());
-            transform.LookAt(target);
-            transform.position = Vector3.MoveTowards(transform.position, target, speed * Time.deltaTime * (forward ? 1f : -0.5f));
+            //var target = grid.GetGridCellPosition(destinationQueue.FirstOrDefault());
+            var target = new Vector3(destinationQueue.FirstOrDefault().x, 0f, destinationQueue.FirstOrDefault().y);
+            //transform.LookAt(target);
+            //transform.position = Vector3.MoveTowards(transform.position, target, speed * Time.deltaTime * (forward ? 1f : -0.5f));
             if(transform.position == target)
                 destinationQueue.RemoveAt(0);
         } 

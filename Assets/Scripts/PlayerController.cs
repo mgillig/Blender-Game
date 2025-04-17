@@ -39,7 +39,7 @@ public class PlayerController : MonoBehaviour
         {
             float verticalInput = Input.GetAxisRaw("Vertical");
             float horizontalInput = Input.GetAxisRaw("Horizontal");
-            var moveDirection = Quaternion.Euler(0f, transform.eulerAngles.y, 0f) * new Vector3(horizontalInput, 0, verticalInput);
+            var moveDirection = Quaternion.Euler(0f, transform.eulerAngles.y, 0f) * new Vector3(horizontalInput, 0f, verticalInput);
             moveDirection.Normalize();
             controller.Move(speed * Time.deltaTime * moveDirection);
         }
