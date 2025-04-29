@@ -9,74 +9,86 @@ using static UnityEngine.GraphicsBuffer;
 
 public class EnemyController : MonoBehaviour
 {
-    public float cooldownTime;
-    public float cooldown;
-    public float earShot;
-    public float speed;
-    public AudioClip activationSound;
-    public AudioClip biteSound;
-    public AudioClip stunSound;
+    [SerializeField] private float cooldown = 0f;
+    [SerializeField] private float cooldownTime;
+    [SerializeField] private float earShot;
+    [SerializeField] private float speed;
+    [SerializeField] private AudioClip activationSound;
+    [SerializeField] private AudioClip biteSound;
+    [SerializeField] private AudioClip stunSound;
+    [SerializeField] private Vector2Int home;
+    [SerializeField] private bool hungy = false;
+    [SerializeField] private bool goHome = false;
+    [SerializeField] private Animator animator;
 
-    private Vector2Int home;
-    private bool? mirrored = null;
-    private Quaternion baseRotate;
     private AudioSource audioSource;
     private Transform playerTransform;
-    private bool activated = false;
-    private bool goHome = false;
     private bool neverPlayedAudio = true;
     private GridController grid;
     private List<Vector2Int> destinationQueue = new List<Vector2Int>();
     private GameController gameController;
     private PlayerController playerController;
+    private bool gameStart = false;
+    private GameObject monkey;
     
     //debug properties
     public bool selected = false;
 
-
-    //[SerializeField] private bool activated = false;
-
     void Start()
     {
         var player = GameObject.Find("Player");
-        playerTransform = player.transform;
+        var debugPlayer = GameObject.Find("debug_Player");
         grid = player.GetComponent<GridController>();
         audioSource = GetComponent<AudioSource>();
         gameController = player.GetComponent<GameController>();
         playerController = player.GetComponent<PlayerController>();
+        monkey = transform.GetChild(0).gameObject;
+
+        playerTransform = player != null ? player.transform : debugPlayer.transform;
         home = new Vector2Int((int)transform.position.x, (int)transform.position.z);
     }
 
     void Update()
     {
-        if (gameController.gameActive)
+        if (gameController.gameActive && gameStart)
         {
-            if(!gameController.debugMode)
+            if (goHome && grid.GetGridCellFromPosition(transform.position) == home)
             {
-                if (cooldown <= 0f)
+                cooldown = 0f;
+                goHome = false;
+                neverPlayedAudio = true;
+            }
+            if (cooldown <= 0f)
+            {
+                if (!goHome)
                 {
-                    if (mirrored.HasValue)
-                        RunStunAnimation(false);
-                    if (!goHome)
-                    {
-                        SeePlayer();
-                        HearPlayer();
-                    }
-                    //else if(grid.GetGridCellFromPosition(transform.position) == home)
-                    else if (new Vector2Int((int)transform.position.x, (int)transform.position.z) == home)
-                    {
-                        goHome = false;
-                        neverPlayedAudio = true;
-                    }
+                    SeePlayer();
                 }
-                else
-                {
-                    cooldown -= Time.deltaTime;
-                }
+                HearPlayer();
+            }
+            else
+            {
+                cooldown -= Time.deltaTime;
             }
 
-            Movement(cooldown <= 0f || !mirrored.HasValue || gameController.debugMode);
+            if(destinationQueue.Any())
+                Movement();
         }
+        else if(gameController.gameActive && !gameStart && Input.anyKeyDown)
+        {
+            gameStart = true;
+        }
+
+        if (!destinationQueue.Any() && !gameController.debugMode)
+            transform.rotation = Quaternion.LookRotation((this.transform.position - playerTransform.position).normalized * -1);
+    }
+
+    public void Respawn()
+    {
+        transform.position = new Vector3(home.x, transform.position.y, home.y);
+        neverPlayedAudio = true;
+        cooldown = cooldownTime;
+        animator.SetTrigger("Respawn");
     }
 
     private void OnMouseOver()
@@ -84,48 +96,61 @@ public class EnemyController : MonoBehaviour
         if(gameController.debugMode && Input.GetButtonDown("Fire1"))
         {
             selected = true;
-            transform.GetChild(0).Rotate(-90f, 0f, 0f);
+            monkey.transform.Rotate(-90f, 0f, 0f);
+            cooldown = cooldownTime;
         }
     }
 
-    //private void OnTriggerEnter(Collider other)
-    //{
-    //    if(other.gameObject.CompareTag("Wall") && destinationQueue.Any())
-    //    {
-    //        var target  = destinationQueue.Last();
-    //        destinationQueue = grid.GetPath(transform.position, target);
-    //    }
-
-    //}
-
     private void SeePlayer()
     {
-        Vector3 direction = (this.transform.position - playerTransform.position).normalized * -1;
-        RaycastHit hit;
-        if (Physics.Raycast(transform.position, direction, out hit))
+        if ((gameController.debugMode && !selected) || !gameController.debugMode)
         {
-            if (hit.collider.gameObject.CompareTag("Player"))
+            Vector3 direction = (this.transform.position - playerTransform.position).normalized * -1;
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position, direction, out hit))
             {
-                //var gridCellPosition = grid.GetGridCellFromPosition(hit.point);
-                var gridCellPosition = new Vector2Int((int)hit.point.x, (int)hit.point.z);
-                if(!destinationQueue.Any() || destinationQueue.LastOrDefault() != gridCellPosition)
+                if (hit.collider.gameObject.CompareTag("Player"))
                 {
-                    var currentPosition = new Vector2Int((int)transform.position.x, (int)transform.position.z);
-                    print("I am at " + currentPosition + " and am looking at the player at " + gridCellPosition);
-                    if (destinationQueue.Any() && Vector2Int.Distance(destinationQueue.LastOrDefault(), currentPosition) > Vector2Int.Distance(gridCellPosition, currentPosition))
-                        destinationQueue.Clear();
-                    if (!destinationQueue.Any() && Vector2Int.Distance(gridCellPosition, currentPosition) > 1)
-                        destinationQueue = grid.GetPath(transform.position, gridCellPosition);
-                    else
-                        destinationQueue.Add(gridCellPosition);
-
-                    if (neverPlayedAudio)
+                    var gridCellPosition = grid.GetGridCellFromPosition(hit.point);
+                    if (!destinationQueue.Any() || destinationQueue.LastOrDefault() != gridCellPosition)
                     {
-                        neverPlayedAudio = false;
-                        audioSource.clip = activationSound;
-                        audioSource.Play();
+                        var currentPosition = grid.GetGridCellFromPosition(transform.position);
+                        print("I am at " + currentPosition + " and am looking at the player at " + gridCellPosition);
+
+                        if(destinationQueue.Any())
+                        {
+                            if (destinationQueue.Contains(gridCellPosition))
+                            {
+                                var index = destinationQueue.IndexOf(gridCellPosition) + 1;
+                                if (index != destinationQueue.Count)
+                                    destinationQueue.RemoveRange(index, destinationQueue.Count - index);
+                            }
+                            else if(destinationQueue.Any(x => Vector2Int.Distance(x, gridCellPosition) <= 1))
+                            {
+                                var index = destinationQueue.IndexOf(destinationQueue.FirstOrDefault(x => Vector2Int.Distance(x, gridCellPosition) <= 1)) + 1;
+                                if (index != destinationQueue.Count)
+                                    destinationQueue.RemoveRange(index, destinationQueue.Count - index);
+                                destinationQueue.Add(gridCellPosition);
+                            }
+                            else
+                            {
+                                destinationQueue.Clear();
+                                destinationQueue = grid.GetPath(transform.position, gridCellPosition);
+                            }
+                        }
+                        else
+                        {
+                            destinationQueue = grid.GetPath(transform.position, gridCellPosition);
+                        }
+
+                        if (neverPlayedAudio)
+                        {
+                            neverPlayedAudio = false;
+                            audioSource.clip = activationSound;
+                            audioSource.Play();
+                        }
+                        hungy = true;
                     }
-                    activated = true;
                 }
             }
         }
@@ -139,92 +164,72 @@ public class EnemyController : MonoBehaviour
 
     private void HearPlayer(Vector2Int? targetGridCell = null)
     {
-        if (Vector3.Distance(transform.position, playerTransform.position) < earShot && !targetGridCell.HasValue)
+        if (Vector3.Distance(transform.position, playerTransform.position) < earShot && !gameController.debugMode)
         {
             bool playerFireInput = Input.GetButtonDown("Fire1");
             if (playerFireInput && playerController.enableFire)
             {
-                activated = true;
-                //var playerGridCellPosition = grid.GetGridCellFromPosition(playerTransform.position);
-                //var currentPosition = grid.GetGridCellFromPosition(transform.position);
-                var playerGridCellPosition = new Vector2Int((int)playerTransform.position.x, (int)playerTransform.position.z);
-                var currentPosition = new Vector2Int((int)transform.position.x, (int)transform.position.z);
+                hungy = true;
+                var playerGridCellPosition = grid.GetGridCellFromPosition(playerTransform.position);
+                var currentPosition = grid.GetGridCellFromPosition(transform.position);
                 print("I am at " + currentPosition + " and hear the player at " + playerGridCellPosition);
-                //print(playerGridCellPosition);
                 destinationQueue = grid.GetPath(transform.position, playerGridCellPosition);
             }
         }
         else if (targetGridCell.HasValue)
         {
-            activated = true;
+            hungy = true;
             var currentPosition = new Vector2Int((int)transform.position.x, (int)transform.position.z);
-            print("I am at " + currentPosition + " and hear the player at " + targetGridCell.Value);
+            print("I am at " + currentPosition + " and hear the player at " + targetGridCell.Value + " (" + Vector2Int.Distance(currentPosition, targetGridCell.Value));
             destinationQueue = grid.GetPath(transform.position, targetGridCell.Value);
             selected = false; 
             transform.GetChild(0).Rotate(90f, 0f, 0f);
         }
     }
 
-    private void Movement(bool forward)
+    private void Movement()
     {
-        if (activated && destinationQueue.Any())
+        var target = new Vector3(destinationQueue.FirstOrDefault().x, transform.position.y, destinationQueue.FirstOrDefault().y);
+        transform.LookAt(target);
+        transform.position = Vector3.MoveTowards(transform.position, target, speed * Time.deltaTime);
+        if (transform.position == target)
         {
-            //var target = grid.GetGridCellPosition(destinationQueue.FirstOrDefault());
-            var target = new Vector3(destinationQueue.FirstOrDefault().x, 0f, destinationQueue.FirstOrDefault().y);
-            //transform.LookAt(target);
-            //transform.position = Vector3.MoveTowards(transform.position, target, speed * Time.deltaTime * (forward ? 1f : -0.5f));
-            if(transform.position == target)
-                destinationQueue.RemoveAt(0);
-        } 
+            destinationQueue.RemoveAt(0);
+            if (gameController.debugMode && !destinationQueue.Any() && grid.GetGridCellFromPosition(transform.position) != home)
+                SendHome();
+        }
     }
 
     private void SendHome()
     {
+        cooldown = cooldownTime;
         goHome = true;
+        hungy = false;
+        neverPlayedAudio = true;
         destinationQueue = grid.GetPath(transform.position, home);
     }
 
     public bool IsActive()
     {
-        return activated && cooldown <= 0f;
+        return hungy && cooldown <= 0f;
     }
 
     public void TriggerStun(bool wasAttacked)
     {
-        if (cooldown <= 0f)
+        if (!wasAttacked && cooldown <= 0f)
         {
-
-            if (!wasAttacked)
-            {
-                audioSource.clip = biteSound;
-                audioSource.Play();
-                SendHome();
-            }
-            else
-            {
-                cooldown = cooldownTime;
-                RunStunAnimation(wasAttacked);
-                audioSource.clip = stunSound;
-                audioSource.Play();
-            }
-        }
-    }
-
-    private void RunStunAnimation(bool stun)
-    {
-        var activateStun = !mirrored.HasValue;
-        var monkey = transform.GetChild(0);
-        //animator.SetBool("Stun", runAnimation);
-        if (activateStun)
-        {
-            baseRotate = monkey.rotation;
-            mirrored = Random.Range(0, 2) == 0;
-            monkey.Rotate(new Vector3(15f * (stun ? -1f : 0f), 15f * (mirrored.Value ? 1f : -1f), 0f));
+            audioSource.clip = biteSound;
+            audioSource.Play();
+            SendHome();
         }
         else
         {
-            monkey.rotation = baseRotate;
-            mirrored = null;
+            audioSource.clip = stunSound;
+            audioSource.Play();
+            destinationQueue.Clear();
+            cooldown = cooldownTime;
+            hungy = false;
+            animator.SetTrigger("Kill");
         }
     }
 }

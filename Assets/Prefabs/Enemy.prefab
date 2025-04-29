@@ -29,7 +29,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 30, y: 30, z: 30}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 6552932757679416489}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -96,9 +96,9 @@ GameObject:
   m_Component:
   - component: {fileID: 6552932757679416489}
   - component: {fileID: 373656055125760463}
-  - component: {fileID: 3425748832014258724}
   - component: {fileID: 7325439961916137996}
-  - component: {fileID: 5478318814548136191}
+  - component: {fileID: 5510918474459459804}
+  - component: {fileID: 1130219609796071267}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Enemy
@@ -134,34 +134,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d527978edc280414e9b4818c26ace9ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cooldownTime: 3
-  cooldown: 3
+  cooldownTime: 5
   earShot: 10
   speed: 1
   activationSound: {fileID: 8300000, guid: a0e06b8017be12e43a1ece1e2f58e972, type: 3}
   biteSound: {fileID: 8300000, guid: 43ce7634eb59d3349ac3a68327af500c, type: 3}
   stunSound: {fileID: 8300000, guid: b7466d64ecc04a146a1d227233d0f11c, type: 3}
---- !u!135 &3425748832014258724
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5032635465532813001}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 0
-  serializedVersion: 3
-  m_Radius: 0.19
-  m_Center: {x: 0, y: 0, z: 0.18}
+  home: {x: 0, y: 0}
+  hungy: 0
+  goHome: 0
+  isDead: 0
+  animator: {fileID: 1130219609796071267}
+  selected: 0
 --- !u!82 &7325439961916137996
 AudioSource:
   m_ObjectHideFlags: 0
@@ -286,8 +270,8 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!65 &5478318814548136191
-BoxCollider:
+--- !u!135 &5510918474459459804
+SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -305,5 +289,27 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.83, y: 0.9, z: 0.6}
-  m_Center: {x: 0, y: 0, z: -0.08}
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &1130219609796071267
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5032635465532813001}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: c61d782f05ec1084c9be47c3311143e1, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

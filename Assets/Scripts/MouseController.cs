@@ -5,8 +5,8 @@ using UnityEngine;
 
 public class MouseController : MonoBehaviour
 {
-    public float sensitivity = 2.0f;
-    public GameObject player;
+    [SerializeField] private float sensitivity = 2.0f;
+    [SerializeField] private GameObject player;
 
     private bool enableCamera = false;
 

@@ -7,15 +7,15 @@ using UnityEngine.UIElements;
 
 public class PlayerController : MonoBehaviour
 {
-    public CharacterController controller;
-    public GameObject player;
-    public float speed = 6f;
-    public Animator shotgunAnimator;
-    public bool enableMove = false;
-    public bool enableFire = true;
-    public bool gameStart = false;
-    public AudioClip fireSound;
-    public AudioClip deathSound;
+    [SerializeField] public bool enableMove = false;
+    [SerializeField] public bool enableFire = true;
+
+    [SerializeField] private CharacterController controller;
+    [SerializeField] private GameObject player;
+    [SerializeField] private float speed = 6f;
+    [SerializeField] private Animator shotgunAnimator;
+    [SerializeField] private AudioClip fireSound;
+    [SerializeField] private AudioClip deathSound;
 
     private int health;
     private PlayerHealth playerHealth;
@@ -59,13 +59,18 @@ public class PlayerController : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         var enemyController = other.gameObject.GetComponent<EnemyController>();
-        if(enemyController != null && enemyController.IsActive() && gameController.gameActive)
+        if(enemyController != null && enemyController.IsActive() && gameController.gameActive && !gameController.debugMode)
         {
             health--;
             playerHealth.SetHealth(health);
             if(health == 0)
                 Die();
-            enemyController.TriggerStun(false);
+            else
+                enemyController.TriggerStun(false);
+        }
+        else if (gameController.debugMode)
+        {
+            enemyController.TriggerStun(true);
         }
     }
 

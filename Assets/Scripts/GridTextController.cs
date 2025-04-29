@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GridTextController : MonoBehaviour
 {
-    public TextMeshPro textMesh;
+    [SerializeField] private TextMeshPro textMesh;
     private GameController gameController;
     private GameObject[] enemies;
 

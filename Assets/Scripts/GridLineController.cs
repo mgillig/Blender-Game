@@ -2,10 +2,9 @@ using UnityEngine;
 
 public class GridLineController : MonoBehaviour
 {
-    public GameObject gridLineX;
-    public GameObject gridLineY;
-    //public Transform gridLineParent;
-    public float spacing;
+    [SerializeField] private GameObject gridLineX;
+    [SerializeField] private GameObject gridLineY;
+    [SerializeField] private float spacing;
     void Start()
     {
         for (float i = spacing; i <= 100; i += spacing)

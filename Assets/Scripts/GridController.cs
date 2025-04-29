@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -5,19 +6,19 @@ using System.Runtime.InteropServices;
 using Assets.Scripts;
 using JetBrains.Annotations;
 using TMPro;
+using Unity.Burst.CompilerServices;
 using UnityEngine;
 
 public class GridController : MonoBehaviour
 {
     //public GameObject gridCell;
-    public GameObject wall;
-    public GameObject enemy;
-    public GameObject victory;
-    public int gridSize;
-    public int enemySpawnRate;
-    public int lightFrequency;
-    public GameObject mazeEntitiesParent;
-    public GameObject gridText;
+    [SerializeField] private GameObject wall;
+    [SerializeField] private GameObject enemy;
+    [SerializeField] private GameObject victory;
+    [SerializeField] private int gridSize;
+    [SerializeField] private int enemySpawnRate;
+    [SerializeField] private GameObject mazeEntitiesParent;
+    [SerializeField] private GameObject gridText;
 
     private GridCellModel[,] grid;
     private List<Vector2Int> availableCells;
@@ -47,11 +48,19 @@ public class GridController : MonoBehaviour
         }
     }
 
+    public Vector2Int GetGridCellFromPosition(Vector3 position)
+    {
+        var x = position.x - Math.Truncate(position.x) >= 0.5f ? (int)position.x + 1 : (int)position.x;
+        var z = position.z - Math.Truncate(position.z) >= 0.5f ? (int)position.z + 1 : (int)position.z;
+        return new Vector2Int(x, z);
+    }
+
     public List<Vector2Int> GetPath(Vector3 start, Vector2Int destination)
     {
-        var startGridCell = new Vector2Int((int)start.x, (int)start.z);
+        //var startGridCell = new Vector2Int((int)start.x, (int)start.z);
+        var startGridCell = GetGridCellFromPosition(start);
 
-        var path = GetPath(startGridCell, destination);
+        var path = GetPath(startGridCell, destination).Distinct().ToList();
         if (gameController.debugMode)
             DrawDebugLines(path);
 
@@ -114,16 +123,6 @@ public class GridController : MonoBehaviour
         return neighbors;
     }
 
-    //public Vector2Int GetGridCellFromPosition(Vector3 position)
-    //{
-    //    return new Vector2Int((int)(position.x / wall.transform.localScale.x) + (gridSize / 2), (int)(position.z / wall.transform.localScale.x) + (gridSize / 2));
-    //}
-
-    //public Vector3 GetGridCellPosition(Vector2Int gridCell)
-    //{
-    //    return new Vector3((gridCell.x - (gridSize / 2)) * wall.transform.localScale.x, wall.transform.localScale.y/2, (gridCell.y - (gridSize / 2)) * wall.transform.localScale.x);
-    //}
-
     public void ActivateGrid()
     {
         if (!gridActivationTrigger)
@@ -155,7 +154,7 @@ public class GridController : MonoBehaviour
 
     public void BuildGrid()
     {
-        int victorySide = Random.Range(0, 4);
+        int victorySide = UnityEngine.Random.Range(0, 4);
         wall.SetActive(false);
 
         for (int z = 0; z < grid.GetLength(1); z++)
@@ -165,13 +164,15 @@ public class GridController : MonoBehaviour
                 //if (x > (gridSize / 2) - 1 && x < (gridSize / 2) + 1 && z > (gridSize / 2) - 1 && z < (gridSize / 2) + 1)
                 //    continue;
                 var gridCell = grid[x, z];
+                var sNeighbor = z > 0 ? grid[x, z - 1] : null;
+                var wNeighbor = x > 0 ? grid[x - 1, z] : null;
                 var cellLocation = new Vector3(x, wall.transform.localScale.y / 2, z);
 
                 if(gameController.debugMode)
                     GenerateMazeText(cellLocation, x, z);
                 //build walls
                 //S and W walls
-                if (gridCell.SWallActive)
+                if (gridCell.SWallActive || (sNeighbor != null && sNeighbor.NWallActive))
                 {
                     wall.name = "wall (" + x + ", " + z + ") S";
                     var wallLocation = new Vector3(cellLocation.x, cellLocation.y, cellLocation.z - 0.5f);
@@ -183,7 +184,7 @@ public class GridController : MonoBehaviour
                     else
                         wallLayers.Add((int)cellLocation.x * -1, new List<GameObject>() { newWall });
                 }
-                if (gridCell.WWallActive)
+                if (gridCell.WWallActive || (wNeighbor != null && wNeighbor.EWallActive))
                 {
                     wall.name = "wall (" + x + ", " + z + ") W";
                     var wallLocation = new Vector3(cellLocation.x - 0.5f, cellLocation.y, cellLocation.z);
@@ -238,7 +239,7 @@ public class GridController : MonoBehaviour
                 //Set Enemies
                 if ((gridCell.NWallActive ? 1 : 0) + (gridCell.SWallActive ? 1 : 0) + (gridCell.EWallActive ? 1 : 0) + (gridCell.WWallActive ? 1 : 0) == 3 &&
                     (x > (gridSize / 2) + 1 || x < (gridSize / 2) - 1 || z > (gridSize / 2) + 1 || z < (gridSize / 2) - 1) &&
-                    Random.Range(0, enemySpawnRate) == 0)
+                    UnityEngine.Random.Range(0, enemySpawnRate) == 0)
                 {
                     Instantiate(enemy, cellLocation, new Quaternion(), mazeEntitiesParent.transform);
                 }
@@ -266,13 +267,24 @@ public class GridController : MonoBehaviour
         var neighbors = FindFrontier(currentCell);
 
         GenerateMaze(currentCell, neighbors);
-    }
 
+        for(int x = (gridSize / 2) - 1; x <= (gridSize / 2) + 1; x++)
+        {
+            for (int z = (gridSize / 2) - 1; z <= (gridSize / 2) + 1; z++)
+            {
+                grid[x, z].NWallActive = grid[x, z + 1].SWallActive;
+                grid[x, z].SWallActive = grid[x, z - 1].NWallActive;
+                grid[x, z].EWallActive = grid[x + 1, z].WWallActive;
+                grid[x, z].WWallActive = grid[x - 1, z].EWallActive;
+            }
+        }
+    }
+    
     private void GenerateMaze(Vector2Int currentCell, List<Vector2Int> eligibleNeighbors)
     {
         if (eligibleNeighbors.Any())
         {
-            var frontierToAdd = eligibleNeighbors[Random.Range(0, eligibleNeighbors.Count)];
+            var frontierToAdd = eligibleNeighbors[UnityEngine.Random.Range(0, eligibleNeighbors.Count)];
             availableCells.Add(frontierToAdd);
             eligibleNeighbors.Remove(frontierToAdd);
             if (!eligibleNeighbors.Any())
@@ -325,7 +337,7 @@ public class GridController : MonoBehaviour
         }
         if (availableCells.Any())
         {
-            currentCell = availableCells[Random.Range(0, availableCells.Count)];
+            currentCell = availableCells[UnityEngine.Random.Range(0, availableCells.Count)];
             eligibleNeighbors = FindFrontier(currentCell);
 
             if (!eligibleNeighbors.Any())
@@ -345,6 +357,7 @@ public class GridController : MonoBehaviour
             GenerateMaze(currentCell, eligibleNeighbors);
         }
     }
+    
     private List<Vector2Int> FindFrontier(Vector2Int currentCell)
     {
         var neighbors = new List<Vector2Int>();

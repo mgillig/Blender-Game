@@ -4,7 +4,7 @@ public class GameController : MonoBehaviour
 {
     public bool debugMode = false;
     public bool gameActive = false;
-    public GameObject player;
+    //[SerializeField] private GameObject player;
     private CharacterController characterController;
     private GridController gridController;
     private MouseController mouseController;
@@ -36,7 +36,6 @@ public class GameController : MonoBehaviour
         gridController.ActivateGrid();
         mouseController.SetMouseMode(true, true);
         playerController.enableMove = true;
-        playerController.gameStart = true;
         //characterController.Move(new Vector3(0f, (player.transform.position.y - 1f) * -1f, 0f));
         if(gridLines != null)
             gridLines.transform.Translate(0f, gridLines.transform.position.y * -1, 0f);
