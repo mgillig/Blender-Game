@@ -1585,6 +1585,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4908488988109900457, guid: e2377461956cb814895ba47e6dea565c, type: 3}
+      propertyPath: enemySpawnRate
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4908488988109900457, guid: e2377461956cb814895ba47e6dea565c, type: 3}
       propertyPath: mazeEntitiesParent
       value: 
       objectReference: {fileID: 1268839409}
