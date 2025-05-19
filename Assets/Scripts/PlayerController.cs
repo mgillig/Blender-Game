@@ -59,7 +59,7 @@ public class PlayerController : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         var enemyController = other.gameObject.GetComponent<EnemyController>();
-        if(enemyController != null && enemyController.IsActive() && gameController.gameActive && !gameController.debugMode)
+        if(enemyController != null && enemyController.IsActive() && gameController.gameStarted && !gameController.debugMode)
         {
             health--;
             playerHealth.SetHealth(health);

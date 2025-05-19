@@ -29,7 +29,7 @@ public class MouseController : MonoBehaviour
     public void SetMouseMode(bool allowCameraRotate, bool lockMouse)
     {
         enableCamera = allowCameraRotate;
-        if(lockMouse)
+        if (lockMouse)
             Cursor.lockState = CursorLockMode.Locked;
         else
             Cursor.lockState = CursorLockMode.Confined;

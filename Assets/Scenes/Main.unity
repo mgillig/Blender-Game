@@ -1540,6 +1540,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2619193249869460758, guid: e2377461956cb814895ba47e6dea565c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4908488988109900452, guid: e2377461956cb814895ba47e6dea565c, type: 3}
       propertyPath: m_Name
       value: Player
@@ -1585,10 +1589,6 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4908488988109900457, guid: e2377461956cb814895ba47e6dea565c, type: 3}
-      propertyPath: enemySpawnRate
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 4908488988109900457, guid: e2377461956cb814895ba47e6dea565c, type: 3}
       propertyPath: mazeEntitiesParent
       value: 
       objectReference: {fileID: 1268839409}
@@ -1599,6 +1599,26 @@ PrefabInstance:
     - target: {fileID: 5832384840941375863, guid: e2377461956cb814895ba47e6dea565c, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7318414625576983429, guid: e2377461956cb814895ba47e6dea565c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7796491334711483607, guid: e2377461956cb814895ba47e6dea565c, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7796491334711483607, guid: e2377461956cb814895ba47e6dea565c, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7846404200648291826, guid: e2377461956cb814895ba47e6dea565c, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8562918569750524895, guid: e2377461956cb814895ba47e6dea565c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -50,7 +50,7 @@ public class EnemyController : MonoBehaviour
 
     void Update()
     {
-        if (gameController.gameActive && gameStart)
+        if (gameController.gameStarted && gameStart)
         {
             if (goHome && grid.GetGridCellFromPosition(transform.position) == home)
             {
@@ -74,7 +74,7 @@ public class EnemyController : MonoBehaviour
             if(destinationQueue.Any())
                 Movement();
         }
-        else if(gameController.gameActive && !gameStart && Input.anyKeyDown)
+        else if(gameController.gameStarted && !gameStart && Input.anyKeyDown)
         {
             gameStart = true;
         }
