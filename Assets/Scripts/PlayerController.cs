@@ -13,7 +13,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private CharacterController controller;
     [SerializeField] private GameObject player;
     [SerializeField] private float speed = 6f;
-    [SerializeField] private Animator shotgunAnimator;
+    [SerializeField] private GameObject shotgun;
+    //[SerializeField] private Animator shotgunAnimator;
     [SerializeField] private AudioClip fireSound;
     [SerializeField] private AudioClip deathSound;
 
@@ -21,7 +22,7 @@ public class PlayerController : MonoBehaviour
     private PlayerHealth playerHealth;
     private AudioSource audioSource;
     private GameController gameController;
-    private bool endGame = false;
+    private Animator shotgunAnimator;
 
     // Start is called before the first frame update
     void Start()
@@ -30,6 +31,7 @@ public class PlayerController : MonoBehaviour
         health = playerHealth.GetMaxHealth();
         audioSource = GetComponent<AudioSource>();
         gameController = GetComponent<GameController>();
+        shotgunAnimator = shotgun.GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -49,10 +51,10 @@ public class PlayerController : MonoBehaviour
             if (fireInput)
                 Fire();
         }
-        if(endGame && !audioSource.isPlaying)
-        {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-        }
+        //if(endGame && !audioSource.isPlaying)
+        //{
+        //    SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        //}
 
     }
 
@@ -76,11 +78,12 @@ public class PlayerController : MonoBehaviour
 
     private void Die()
     {
-        transform.GetChild(1).GetChild(2).GetChild(0).gameObject.SetActive(true);
+        //transform.GetChild(1).GetChild(2).GetChild(0).gameObject.SetActive(true);
         audioSource.clip = deathSound;
         audioSource.Play();
-        gameController.PauseGame();
-        endGame = true;
+        gameController.Die();
+        //gameController.PauseGame();
+        //endGame = true;
     }
 
     private void Fire()
@@ -101,6 +104,22 @@ public class PlayerController : MonoBehaviour
                 else if(cubeController != null)
                     cubeController.TriggerStart();
             }
+        }
+    }
+
+    public void EquipShotgun(bool equip)
+    {
+        if (equip && !shotgun.activeInHierarchy)
+        {
+            shotgun.SetActive(true);
+            if (shotgunAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Ready"))
+                shotgunAnimator.SetTrigger("Equip");
+        }
+        else if(!equip)
+        {
+            //if (shotgunAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Ready"))
+            //    shotgunAnimator.SetTrigger("Unequip");
+            shotgun.SetActive(false);
         }
     }
 }
