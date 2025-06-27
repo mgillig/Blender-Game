@@ -16,13 +16,13 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameObject shotgun;
     //[SerializeField] private Animator shotgunAnimator;
     [SerializeField] private AudioClip fireSound;
-    [SerializeField] private AudioClip deathSound;
 
     private int health;
     private PlayerHealth playerHealth;
     private AudioSource audioSource;
     private GameController gameController;
     private Animator shotgunAnimator;
+    private AnimatorStateInfo animatorState;
 
     // Start is called before the first frame update
     void Start()
@@ -60,31 +60,32 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        var enemyController = other.gameObject.GetComponent<EnemyController>();
-        if(enemyController != null && enemyController.IsActive() && gameController.gameStarted && !gameController.debugMode)
+        if (gameController.gameActive)
         {
-            health--;
-            playerHealth.SetHealth(health);
-            if(health == 0)
-                Die();
-            else
-                enemyController.TriggerStun(false);
-        }
-        else if (gameController.debugMode)
-        {
-            enemyController.TriggerStun(true);
+            var enemyController = other.gameObject.GetComponent<EnemyController>();
+            if (enemyController != null && enemyController.IsActive() && gameController.gameStarted && !gameController.debugMode)
+            {
+                health--;
+                playerHealth.SetHealth(health);
+                if (health == 0)
+                    gameController.Die();
+                else
+                    enemyController.TriggerStun(false);
+            }
+            else if (gameController.debugMode)
+            {
+                enemyController.TriggerStun(true);
+            }
         }
     }
 
-    private void Die()
-    {
-        //transform.GetChild(1).GetChild(2).GetChild(0).gameObject.SetActive(true);
-        audioSource.clip = deathSound;
-        audioSource.Play();
-        gameController.Die();
-        //gameController.PauseGame();
-        //endGame = true;
-    }
+    //private void Die()
+    //{
+    //    audioSource.clip = deathSound;
+    //    audioSource.loop = true;
+    //    audioSource.Play();
+    //    gameController.Die();
+    //}
 
     private void Fire()
     {
@@ -92,6 +93,7 @@ public class PlayerController : MonoBehaviour
         {
             shotgunAnimator.SetTrigger("Fire");
             audioSource.clip = fireSound;
+            audioSource.loop = false;
             audioSource.Play();
             RaycastHit hit;
             //Debug.DrawRay(transform.position, Quaternion.Euler(0f, transform.eulerAngles.y, 0f) * Vector3.forward, Color.red);
@@ -107,19 +109,28 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void EquipShotgun(bool equip)
+    public void EquipShotgun(bool equip, bool showEquipAnimation = false)
     {
         if (equip && !shotgun.activeInHierarchy)
         {
             shotgun.SetActive(true);
-            if (shotgunAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Ready"))
+            var tagHashTest = Animator.StringToHash("Ready");
+            var tagHashTest2 = Animator.StringToHash("Busy");
+            if (showEquipAnimation && (animatorState.IsTag("Ready") || animatorState.tagHash == 0))
                 shotgunAnimator.SetTrigger("Equip");
+            else
+                shotgunAnimator.Play(animatorState.shortNameHash, 0, animatorState.normalizedTime);
         }
         else if(!equip)
         {
-            //if (shotgunAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Ready"))
-            //    shotgunAnimator.SetTrigger("Unequip");
+            animatorState = shotgunAnimator.GetCurrentAnimatorStateInfo(0);
             shotgun.SetActive(false);
         }
+    }
+
+    public void ResetHealth()
+    {
+        health = playerHealth.GetMaxHealth();
+        playerHealth.SetHealth(playerHealth.GetMaxHealth());
     }
 }

@@ -32,6 +32,6 @@ public class MouseController : MonoBehaviour
         if (lockMouse)
             Cursor.lockState = CursorLockMode.Locked;
         else
-            Cursor.lockState = CursorLockMode.Confined;
+            Cursor.lockState = CursorLockMode.None;
     }
 }

@@ -14,4 +14,12 @@ public class PlayerHealth : MonoBehaviour
     {
         return (int)healthBar.maxValue;
     }
+
+    public void DisplayHealthBar(bool healthBarActive)
+    {
+        for(int i = 0; i < transform.childCount; i++)
+        {
+            transform.GetChild(i).gameObject.SetActive(healthBarActive);
+        }
+    }
 }

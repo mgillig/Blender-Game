@@ -18,12 +18,13 @@ public class GridController : MonoBehaviour
     [SerializeField] private int gridSize;
     [SerializeField] private int enemySpawnRate;
     [SerializeField] private GameObject mazeEntitiesParent;
+    [SerializeField] private GameObject mazeWallsParent;
     [SerializeField] private GameObject gridText;
 
     private GridCellModel[,] grid;
     private List<Vector2Int> availableCells;
     private Dictionary<int, List<GameObject>> wallLayers = new Dictionary<int, List<GameObject>>();
-    private bool gridActivationTrigger = false;
+    //private bool gridActivationTrigger = false;
     private bool activateGrid = false;
     private GameController gameController;
 
@@ -33,9 +34,7 @@ public class GridController : MonoBehaviour
         gameController = GetComponent<GameController>();
         if (gameController == null)
             print("ERROR: Cannot Find GameController");
-        grid = new GridCellModel[gridSize, gridSize];
-        GenerateMaze();
-        BuildGrid();
+        instantiateMaze(false);
     }
 
     // Update is called once per frame
@@ -46,6 +45,26 @@ public class GridController : MonoBehaviour
             StartCoroutine(ActivateGridCoroutine());
             activateGrid = false;
         }
+    }
+
+    public void instantiateMaze(bool reset)
+    {
+        if (reset)
+        {
+            mazeEntitiesParent.SetActive(false);
+            wallLayers = new Dictionary<int, List<GameObject>>();
+            foreach (Transform child in mazeEntitiesParent.transform)
+            {
+                Destroy(child.gameObject);
+            }
+            foreach (Transform child in mazeWallsParent.transform)
+            {
+                Destroy(child.gameObject);
+            }
+        }
+        grid = new GridCellModel[gridSize, gridSize];
+        GenerateMaze();
+        BuildGrid();
     }
 
     public Vector2Int GetGridCellFromPosition(Vector3 position)
@@ -125,9 +144,7 @@ public class GridController : MonoBehaviour
 
     public void ActivateGrid()
     {
-        if (!gridActivationTrigger)
-            activateGrid = true;
-        gridActivationTrigger = true;
+        activateGrid = true;
     }
 
     private IEnumerator ActivateGridCoroutine()
@@ -178,7 +195,7 @@ public class GridController : MonoBehaviour
                     var wallLocation = new Vector3(cellLocation.x, cellLocation.y, cellLocation.z - 0.5f);
                     var wallRotation = new Quaternion(0f, 0f, 0f, 0f);
                     //wallLayers.Add((int)cellLocation.x * -1, Instantiate(wall, wallLocation, wallRotation));
-                    var newWall = Instantiate(wall, wallLocation, wallRotation);
+                    var newWall = Instantiate(wall, wallLocation, wallRotation, mazeWallsParent.transform);
                     if (wallLayers.ContainsKey((int)cellLocation.x * -1))
                         wallLayers[(int)cellLocation.x * -1].Add(newWall);
                     else
@@ -189,7 +206,7 @@ public class GridController : MonoBehaviour
                     wall.name = "wall (" + x + ", " + z + ") W";
                     var wallLocation = new Vector3(cellLocation.x - 0.5f, cellLocation.y, cellLocation.z);
                     //var wallRotation = new Quaternion(0f, 0f, 0f, 0f);
-                    var newWall = Instantiate(wall, wallLocation, new Quaternion());
+                    var newWall = Instantiate(wall, wallLocation, new Quaternion(), mazeWallsParent.transform);
                     newWall.transform.Rotate(new Vector3(0f, -90f, 0f));
                     if (wallLayers.ContainsKey((int)cellLocation.z * -1))
                         wallLayers[(int)cellLocation.z * -1].Add(newWall);
@@ -205,7 +222,7 @@ public class GridController : MonoBehaviour
                     var wallLocation = new Vector3(cellLocation.x, cellLocation.y, cellLocation.z + 0.5f);
                     var wallRotation = new Quaternion(0f, 0f, 0f, 0f);
                     //wallLayers.Add((int)cellLocation.x * -1, Instantiate(wall, wallLocation, wallRotation));
-                    var newWall = Instantiate(wall, wallLocation, wallRotation);
+                    var newWall = Instantiate(wall, wallLocation, wallRotation, mazeWallsParent.transform);
                     if (wallLayers.ContainsKey((int)cellLocation.x * -1))
                         wallLayers[(int)cellLocation.x * -1].Add(newWall);
                     else
@@ -216,7 +233,7 @@ public class GridController : MonoBehaviour
                     wall.name = "wall (" + x + ", " + z + ") E";
                     var wallLocation = new Vector3(cellLocation.x + 0.5f, cellLocation.y, cellLocation.z);
                     //var wallRotation = new Quaternion(0f, 0f, 0f, 0f);
-                    var newWall = Instantiate(wall, wallLocation, new Quaternion());
+                    var newWall = Instantiate(wall, wallLocation, new Quaternion(), mazeWallsParent.transform);
                     newWall.transform.Rotate(new Vector3(0f, -90f, 0f));
                     if (wallLayers.ContainsKey((int)cellLocation.z * -1))
                         wallLayers[(int)cellLocation.z * -1].Add(newWall);

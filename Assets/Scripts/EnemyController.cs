@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.ComponentModel.Design.Serialization;
 using Unity.Burst.CompilerServices;
-using UnityEditor.PackageManager;
+//using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.Timeline;
 using static UnityEngine.GraphicsBuffer;
@@ -50,37 +50,40 @@ public class EnemyController : MonoBehaviour
 
     void Update()
     {
-        if (gameController.gameStarted && gameStart)
+        if (gameController.gameActive)
         {
-            if (goHome && grid.GetGridCellFromPosition(transform.position) == home)
+            if (gameController.gameStarted && gameStart)
             {
-                cooldown = 0f;
-                goHome = false;
-                neverPlayedAudio = true;
-            }
-            if (cooldown <= 0f)
-            {
-                if (!goHome)
+                if (goHome && grid.GetGridCellFromPosition(transform.position) == home)
                 {
-                    SeePlayer();
+                    cooldown = 0f;
+                    goHome = false;
+                    neverPlayedAudio = true;
                 }
-                HearPlayer();
+                if (cooldown <= 0f)
+                {
+                    if (!goHome)
+                    {
+                        SeePlayer();
+                    }
+                    HearPlayer();
+                }
+                else
+                {
+                    cooldown -= Time.deltaTime;
+                }
+
+                if (destinationQueue.Any())
+                    Movement();
             }
-            else
+            else if (gameController.gameStarted && !gameStart && Input.anyKeyDown)
             {
-                cooldown -= Time.deltaTime;
+                gameStart = true;
             }
 
-            if(destinationQueue.Any())
-                Movement();
+            if (!destinationQueue.Any() && !gameController.debugMode)
+                transform.rotation = Quaternion.LookRotation((this.transform.position - playerTransform.position).normalized * -1);
         }
-        else if(gameController.gameStarted && !gameStart && Input.anyKeyDown)
-        {
-            gameStart = true;
-        }
-
-        if (!destinationQueue.Any() && !gameController.debugMode)
-            transform.rotation = Quaternion.LookRotation((this.transform.position - playerTransform.position).normalized * -1);
     }
 
     public void Respawn()
@@ -147,6 +150,7 @@ public class EnemyController : MonoBehaviour
                         {
                             neverPlayedAudio = false;
                             audioSource.clip = activationSound;
+                            audioSource.loop = false;
                             audioSource.Play();
                         }
                         hungy = true;
@@ -219,12 +223,14 @@ public class EnemyController : MonoBehaviour
         if (!wasAttacked && cooldown <= 0f)
         {
             audioSource.clip = biteSound;
+            audioSource.loop = false;
             audioSource.Play();
             SendHome();
         }
         else
         {
             audioSource.clip = stunSound;
+            audioSource.loop = false;
             audioSource.Play();
             destinationQueue.Clear();
             cooldown = cooldownTime;

@@ -17,11 +17,8 @@ public class VictoryController : MonoBehaviour
         {
             var gameController = other.GetComponent<GameController>();
             if (gameController != null)
-                gameController.PauseGame();
-            var victoryScreen = other.gameObject.transform.GetChild(1).GetChild(1);
-            victoryScreen.GetChild(0).gameObject.SetActive(true);
-            victoryScreen.GetChild(1).gameObject.SetActive(true);
-            victoryScreen.GetComponent<TimerController>().SetFinalTime();
+                gameController.Win();
+            audioSource.loop = false;
             audioSource.Play();
             hasWon = true;
         }
